@@ -1,1 +1,1 @@
-||61||61|
+leviffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff|4o|#dz#|099|a|=|0|for|i|in|range|(|100|)|:|if|a|%|2|==|0|:|a|=|a|+|3|else|:|a|=|a|+|5|
