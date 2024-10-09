@@ -27,10 +27,11 @@ public class Lexeur {
             boolean word_is_0 = true;
             boolean error = false;
 
+            System.err.println("\nERREUR: \n");
             while ((caractere = (char) fileReader.read()) != (char)-1) {
                 if(!accepted_charactere.contains(caractere) && !error){
                     error = true;
-                    System.err.println("caractere non accepté utilisé ("+caractere+")");
+                    System.err.println("Caractere non accepté utilisé ("+caractere+")");
                 }
 
                 //Si le caractere est un espace ou un retour a la ligne, le buffer est vider
@@ -67,8 +68,8 @@ public class Lexeur {
                         
                 }
                 else if (caractere != ' ' && caractere != '\n') {
-                    if (buffer.length() > 100 && !error){
-                        error = true;System.err.println("l'identificateur trop long");
+                    if (buffer.length() > 40 && !error){
+                        error = true;System.err.println("Identificateur trop long");
                     }
 
                     boolean char_is_int = 48<=(int) caractere && (int) caractere<=57;
@@ -85,11 +86,11 @@ public class Lexeur {
                     }
                     else if (!char_is_int && !word_is_identif && !error){
                         error = true;
-                        System.err.println("un identificateur doit commencer par une lettre de l'alphabet");
+                        System.err.println("Un identificateur doit commencer par une lettre de l'alphabet");
                     }
                     else if (word_is_0 && char_is_int && !error){
                         error = true;
-                        System.err.println("un nombre ne peut commencer par 0");                  
+                        System.err.println("Un nombre ne peut commencer par 0");                  
                     }
 
                     buffer += caractere;
@@ -101,7 +102,7 @@ public class Lexeur {
                 output.write(buffer+previous_caractere);
                 buffer = "";
             }
-            output.write("\n");
+            System.err.println("\nFIN ERREUR: \n");
 
             output.close();
             fileReader.close();

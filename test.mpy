@@ -1,13 +1,13 @@
-leviffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+Bonjour_je_suis_une_variable_beaucoup_trop_longue
 4o
-#dz#
+#du#``
 099
 
 a = 0
 for i in range(100):
     if a%2==0:
-        a = a+3
+        a=a+3
     else :
-        a = a+5
-
+        a = a + 5
+print(a)
         
