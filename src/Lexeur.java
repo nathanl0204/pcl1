@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.ArraysList;
 import java.util.List;
 
 public class Lexeur {
@@ -27,11 +28,15 @@ public class Lexeur {
             boolean word_is_0 = true;
             boolean error = false;
 
+            int ligne = 0;
+            int colonne = 0;
+            ArrayList<Erreur> erreurs = new ArrayList<Erreur>();
             System.err.println("\nERREUR: \n");
             while ((caractere = (char) fileReader.read()) != (char)-1) {
+                ligne++;
                 if(!accepted_charactere.contains(caractere) && !error){
                     error = true;
-                    System.err.println("Caractere non accepté utilisé ("+caractere+")");
+                    erreurs.add(new Erreur("Caractere non accepté utilisé ("+caractere+")",ligne,colonne));
                 }
 
                 //Si le caractere est un espace ou un retour a la ligne, le buffer est vider
@@ -69,7 +74,7 @@ public class Lexeur {
                 }
                 else if (caractere != ' ' && caractere != '\n') {
                     if (buffer.length() > 40 && !error){
-                        error = true;System.err.println("Identificateur trop long");
+                        erreurs.add(new Erreur("Identificateur trop long",ligne,colonne));
                     }
 
                     boolean char_is_int = 48<=(int) caractere && (int) caractere<=57;
@@ -86,11 +91,11 @@ public class Lexeur {
                     }
                     else if (!char_is_int && !word_is_identif && !error){
                         error = true;
-                        System.err.println("Un identificateur doit commencer par une lettre de l'alphabet");
+                        erreurs.add(new Erreur("Un identificateur doit commencer par une lettre de l'alphabet",ligne,colonne));
                     }
                     else if (word_is_0 && char_is_int && !error){
                         error = true;
-                        System.err.println("Un nombre ne peut commencer par 0");                  
+                        erreurs.add(new Erreur("Un nombre ne peut commencer par 0",ligne,colonne));
                     }
 
                     buffer += caractere;

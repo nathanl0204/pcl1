@@ -1,12 +1,17 @@
 FILE_NAME = Lexeur
-SRC = src/$(FILE_NAME).java
-CLASS = build/$(FILE_NAME).class
+SRC = $(wildcard src/*.java)
+CLASS = $(patsubst src/%.java, build/%.class, $(SRC))
+all: compil
 
-compil: $(SRC)
+compil: $(CLASS)
+
+build: 
 	@mkdir -p build
-	javac -d build $(SRC)
 
-run: $(CLASS)
+build/%.class: src/%.java | build
+	javac -d build $<
+
+run: compil
 	java -cp build $(FILE_NAME)
 
 test: compil run
@@ -14,3 +19,5 @@ test: compil run
 
 clean:
 	rm -rf build
+
+.PHONY: compil run test clean
