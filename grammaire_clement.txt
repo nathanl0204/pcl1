@@ -1,0 +1,76 @@
+file -> opt_newline def_etoile stmt_plus EOF .
+
+opt_newline -> .
+opt_newline -> NEWLINE .
+
+def_etoile -> .
+def_etoile -> deft def_etoile .
+
+stmt_plus -> stmt stmt_plus_fact .
+stmt_plus_fact -> . 
+stmt_plus_fact -> stmt_plus .
+
+deft -> def ident "(" ident_etoile_virgule ")" ":" suite .
+
+ident_etoile_virgule ->  .
+ident_etoile_virgule -> ident_plus_virgule .
+ident_plus_virgule -> ident ident_plus_virgule_fact .
+ident_plus_virgule_fact ->  .
+ident_plus_virgule_fact -> "," ident_plus_virgule .
+
+suite -> simple_stmt NEWLINE .
+suite -> NEWLINE BEGIN stmt_plus END .
+
+simple_stmt -> return expr .
+simple_stmt -> print "(" expr ")" .
+simple_stmt -> ident "=" expr .
+simple_stmt -> expr simple_stmt_fact .
+
+simple_stmt_fact -> .
+simple_stmt_fact -> "[" expr "]" "=" expr .
+
+stmt -> simple_stmt NEWLINE .
+stmt -> if expr ":" suite stmt_else .
+stmt_else -> .
+stmt_else -> else ":" suite .
+
+stmt -> for ident in expr ":" suite .
+
+expr -> const .
+expr -> "-" expr .
+expr -> not expr .
+expr -> ident expr_fact_ident .
+expr -> "[" expr_etoile_virgule "]" .
+expr -> "(" expr ")" .
+
+expr_fact_ident -> .
+expr_fact_ident -> "(" expr_etoile_virgule ")" .
+
+expr -> expr "[" expr "]" .
+expr -> expr binop expr .
+
+expr_etoile_virgule -> .
+expr_etoile_virgule -> expr_plus_virgule .
+expr_plus_virgule -> expr expr_plus_virgule_fact .
+expr_plus_virgule_fact -> .
+expr_plus_virgule_fact -> "," expr_plus_virgule .
+
+binop -> "+" .
+binop -> "-" .
+binop -> "*" .
+binop -> "/""/" .
+binop -> "%" .
+binop -> "<=" .
+binop -> ">=" .
+binop -> ">" .
+binop -> "<" .
+binop -> "!=" .
+binop -> "=""=" .
+binop -> and .
+binop -> or .
+
+const -> integer .
+const -> string .
+const -> True .
+const -> False .
+const -> None .
