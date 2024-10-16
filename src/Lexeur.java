@@ -294,10 +294,12 @@ public class Lexeur {
                             token_stack.add(item);
                         }
                         else if (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
+                            outerloop:
                             while (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
                                 if (indentations_stack.isEmpty()) {
                                     String[] item = {"error", "IE"};
                                     token_stack.add(item);
+                                    break outerloop;
                                 }
                                 else {
                                     indentations_stack.remove(ind_stack_len - 1);
@@ -338,6 +340,15 @@ public class Lexeur {
         System.out.print("]");
     }
 
+    public static boolean is_in(String element, String[] array) {
+        for (int i = 0; i<array.length; i++) {
+            if (element.equals(array[i])){
+                return true;
+            } 
+        }
+        return false;
+    }
+
 
     public static void main(String[] args){
 
@@ -346,9 +357,48 @@ public class Lexeur {
         
             BufferedReader reader = new BufferedReader(fileReader);
 
+            String[] keywords = {"and", "def", "else", "for", "if", "True", "False", "in", "not", "or", "print", "return", "None"};
+
             indentations_stack.add(0);
             indentation_counter = 0;
             Lex(reader, 0, true, stop_lexing);
+
+            int tokens_length = token_stack.size();
+
+            for (int i = 0; i<tokens_length; i++) {
+                String[] item = token_stack.get(i);
+                
+                if (item[0].equals(String.valueOf("word"))) {
+                    if (is_in(item[1], keywords)) {
+                        String[] new_item = {"keyword", item[1]};
+                        token_stack.set(i, new_item);
+                    }
+                    else {
+                        String[] new_item = {"id", item[1]};
+                        token_stack.set(i, new_item);
+                    }
+                }
+                else if (item[1].equals("==")) {
+                    String[] new_item = {item[0], "EQ"};
+                    token_stack.set(i, new_item);
+                }
+                else if (item[1].equals("=")) {
+                    String[] new_item = {item[0], "EQ"};
+                    token_stack.set(i, new_item);
+                }
+                else if (item[1].equals("!=")) {
+                    String[] new_item = {item[0], "NE"};
+                    token_stack.set(i, new_item);
+                }
+                else if (item[1].equals("<")) {
+                    String[] new_item = {item[0], "LT"};
+                    token_stack.set(i, new_item);
+                }
+                else if (item[1].equals(">")) {
+                    String[] new_item = {item[0], "GT"};
+                    token_stack.set(i, new_item);
+                }
+            }
 
             print_tokens(token_stack);
 
