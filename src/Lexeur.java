@@ -6,6 +6,8 @@ import java.util.Arrays;
 
 public class Lexeur {
     private static ArrayList<String[]> token_stack = new ArrayList<>();
+    private static ArrayList<Integer> indentations_stack = new ArrayList<>();
+    private static int indentation_counter;
 
     private static ArrayList<Character> current_buffer = new ArrayList<>();
     private static char previous_caracter;
@@ -128,7 +130,7 @@ public class Lexeur {
                         String[] item = {"ws", "NEWLINE"};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
-                        Lex(reader, 0, true, stop_lexing);
+                        Lex(reader, 40, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ' ') {
                         current_buffer.remove(current_buffer.size() - 1);
@@ -175,7 +177,6 @@ public class Lexeur {
                         Lex(reader, 4, true, stop_lexing);
                     }
                     else {
-                        previous_caracter = curr_car;
                         current_buffer.remove(current_buffer.size() - 1);
                         String[] item = {"number", getAll(current_buffer)};
                         token_stack.add(item);
@@ -275,6 +276,44 @@ public class Lexeur {
                         Lex(reader, 0, false, stop_lexing);
                     }
                     break;
+                case 40:
+                    if (Character.valueOf(curr_car) == ' ') {
+                        indentation_counter ++;
+                        current_buffer.remove(current_buffer.size() - 1);
+                        Lex(reader, 40, true, stop_lexing);
+                    }
+                    else {
+                        current_buffer.remove(current_buffer.size() - 1);
+                        
+                        int ind_stack_len = indentations_stack.size();
+                        
+                        if (indentation_counter > indentations_stack.get(ind_stack_len - 1)) {
+                            indentations_stack.add(indentation_counter);
+
+                            String[] item = {"ws", "BEGIN"};
+                            token_stack.add(item);
+                        }
+                        else if (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
+                            while (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
+                                if (indentations_stack.isEmpty()) {
+                                    String[] item = {"error", "IE"};
+                                    token_stack.add(item);
+                                }
+                                else {
+                                    indentations_stack.remove(ind_stack_len - 1);
+                                    String[] item = {"ws", "END"};
+                                    token_stack.add(item);
+                                }
+
+                                ind_stack_len = indentations_stack.size();
+                            }
+                        }
+
+                        indentation_counter = 0;
+                        current_buffer = new ArrayList<>();
+                        Lex(reader, 0, false, stop_lexing);
+                    }
+                    break;
                 
             }
         }
@@ -307,6 +346,8 @@ public class Lexeur {
         
             BufferedReader reader = new BufferedReader(fileReader);
 
+            indentations_stack.add(0);
+            indentation_counter = 0;
             Lex(reader, 0, true, stop_lexing);
 
             print_tokens(token_stack);

@@ -12,7 +12,7 @@ g = a % b
 
 if a < b:
     print("a est plus petit que b")
-elif a > b:
+        elif a >                           b:
     print("a est plus grand que b")
 elif a >= b:
     print("a est plus grand ou egal à b")
@@ -41,8 +41,8 @@ print("Le résultat de l'addition est:", resultat)
 liste = [1, 2, 3, 4, 5]
 dictionnaire = {'a': 1, 'b': 2, 'c': 3}
 
-fonction_lambda = lambda x: x * 2
-print("Résultat de la fonction lambda:", fonction_lambda(a))
+fonction_lambda = lambda x: x * 2\"
+print("Résultat de la fonc\"tion lambda:", fonction_lambda(a))
 
 def decorateur(func):
     def wrapper():
