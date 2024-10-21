@@ -11,11 +11,11 @@ f = a /// b
 g = a % b
 
 if a < b:
-    print("a est plus petit que b")
+    pr\"int#("a est plus petit que b")
         elif a >                           b:
-    print("a est plus grand que b")
+    print("a est pl\"us grand que b")
 elif a >= b:
-    print("a est plus grand ou egal à b")
+    pri[[]]nt("a est plus grand ou egal à b")
 elif a <= b:
     print("a est plus petit ou egal à b")
 elif a == b:

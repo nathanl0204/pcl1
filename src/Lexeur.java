@@ -229,7 +229,7 @@ public class Lexeur {
                         Lex(reader, 0, false, stop_lexing);
                     }
                     break;
-                case 25: // AJOUTER LE NOEUD 20 QUAND TOUT FONCTIONNE
+                case 25:
                     if (Character.valueOf(curr_car) == '/') {
                         String[] item = {"op", "DIV"};
                         token_stack.add(item);
