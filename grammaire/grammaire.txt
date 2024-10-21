@@ -1,78 +1,51 @@
 Grammaire d'origine :
 
-<file> ::= NEWLINE? <def>* <stmt>+ EOF
-<def> ::= def <ident> ( <ident>*, ) : <suite>
+<file> ::= <newline_?> NEWLINE? <def_*> <stmt_+> EOF
+ 
+<newline_?> := ε | NEWLINE
+
+<def_*> := ε | <def> <def_*>
+
+<stmt_+> := <stmt> <stmt_+_fact>
+<stmt_+_fact> = ε | <stmt_+>
+
+<def> ::= def <ident> ( <ident_*_,> ) : <suite>
+
+<ident_*_,> := ε | <ident_+_,>
+<ident_+_,> :=  <ident> <ident_+_,_fact>
+<ident_+_,_fact> := ε | , <ident_+_,>
+
 <suite> ::= <simple_stmt> NEWLINE
-            | NEWLINE BEGIN <stmt>+ END
+            | NEWLINE BEGIN <stmt_+> END
+
 <simple_stmt> ::= return <expr>
                 | <ident> = <expr>
                 | <expr> [ <expr> ] = <expr>
                 | print ( <expr> )
                 | <expr>
+
 <stmt> ::= <simple_stmt> NEWLINE
         | if <expr> : <suite>
         | if <expr> : <suite> else : <suite>
         | for <ident> in <expr> : <suite>
+
 <expr> ::= <const>
         | <ident>
         | <expr> [ <expr> ]
         | - <expr>
         | not <expr>
         | <expr> <binop> <expr>
-        | <ident> ( <expr>*, )
-        | [ <expr>*, ]
+        | <ident> ( <expr_*_,> )
+        | [ <expr_*_,> ]
         | ( <expr> )
+
+<expr_*_,> := ε | <expr_+_,>
+<expr_+_,> :=  <expr> <expr_+_,_fact>
+<expr_+_,_fact> := ε | , <expr_+_,>
+
+
 <binop> ::= + | - | * | // | % | <= | >= | > | < | != | ==
         | and | or
+
 <const> ::= <integer> | <string> | True | False | None 
 
-Grammaire LL(1) :
-
-<file> ::= <opt_newline> <def_list> <stmt_list> EOF
-<opt_newline> ::= NEWLINE | ε
-<def_list> ::= <def> <def_list> 
-            | ε
-<stmt_list> ::= <stmt> <stmt_list>
-            | ε
-<def> ::= def <ident> ( <ident_list> ) : <suite>
-<ident_list> ::= <ident> <ident_list_rest>
-              | ε
-<ident_list_rest> ::= , <ident> <ident_list_rest>
-                   | ε
-<suite> ::= <simple_stmt> NEWLINE
-          | NEWLINE BEGIN <stmt_list> END
-<simple_stmt> ::= return <expr>
-               | <ident> = <expr>
-               | <expr> [ <expr> ] = <expr>
-               | print ( <expr> )
-               | <expr>
-<stmt> ::= <simple_stmt> NEWLINE
-        | if <expr> : <suite> <else_part>
-        | for <ident> in <expr> : <suite>
-<else_part> ::= else : <suite>
-             | ε
-<expr> ::= <term> <expr_prime>
-<expr_prime> ::= <binop> <term> <expr_prime>
-              | ε
-<term> ::= <factor> <term_prime>
-<term_prime> ::= [ <expr> ] <term_prime_rest>
-              | ε
-<term_prime_rest> ::= = <expr>
-                   | ε
-<factor> ::= <const>
-           | <ident> <factor_prime>
-           | [ <expr_list> ]
-           | - <factor>
-           | not <factor>
-           | ( <expr> )
-<factor_prime> ::= ( <arg_list> ) | ε
-<arg_list> ::= <expr> <arg_list_rest>
-            | ε
-<arg_list_rest> ::= , <expr> <arg_list_rest>
-                 | ε
-<expr_list> ::= <expr> <expr_list_rest>
-             | ε
-<expr_list_rest> ::= , <expr> <expr_list_rest>
-                  | ε
-<binop> ::= + | - | * | // | % | <= | >= | > | < | != | == | and | or
-<const> ::= <integer> | <string> | True | False | None
