@@ -8,6 +8,7 @@ public class Lexeur {
     private static ArrayList<String[]> token_stack = new ArrayList<>();
     private static ArrayList<Integer> indentations_stack = new ArrayList<>();
     private static int indentation_counter;
+    private static int line_number = 1; // Ajout d'un compteur de ligne
 
     private static ArrayList<Character> current_buffer = new ArrayList<>();
     private static char previous_caracter;
@@ -55,7 +56,7 @@ public class Lexeur {
                         Lex(reader, 1, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '0') {
-                        String[] item = {"number", "0"};
+                        String[] item = {"number", "0", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
@@ -73,25 +74,25 @@ public class Lexeur {
                         Lex(reader, 14, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '(') {
-                        String[] item = {"op", "LP"};
+                        String[] item = {"op", "LP", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ')') {
-                        String[] item = {"op", "RP"};
+                        String[] item = {"op", "RP", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '[') {
-                        String[] item = {"op", "LB"};
+                        String[] item = {"op", "LB", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ']') {
-                        String[] item = {"op", "RB"};
+                        String[] item = {"op", "RB", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
@@ -100,25 +101,25 @@ public class Lexeur {
                         Lex(reader, 25, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '+') {
-                        String[] item = {"op", "ADD"};
+                        String[] item = {"op", "ADD", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '*') {
-                        String[] item = {"op", "MULT"};
+                        String[] item = {"op", "MULT", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '%') {
-                        String[] item = {"op", "MOD"};
+                        String[] item = {"op", "MOD", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '-') {
-                        String[] item = {"op", "SUB"};
+                        String[] item = {"op", "SUB", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
@@ -127,9 +128,10 @@ public class Lexeur {
                         Lex(reader, 33, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == '\n') {
-                        String[] item = {"ws", "NEWLINE"};
+                        String[] item = {"ws", "NEWLINE", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
+                        line_number++; // Incrémentation du numéro de ligne
                         Lex(reader, 40, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ' ') {
@@ -141,21 +143,22 @@ public class Lexeur {
                         Lex(reader, 39, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ':') {
-                        String[] item = {"op", "DD"};
+                        String[] item = {"op", "DD", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else if (Character.valueOf(curr_car) == ',') {
-                        String[] item = {"op", "COM"};
+                        String[] item = {"op", "COM", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"error", "NR"};
+                        String[] item = {"error", "NR", String.valueOf(line_number)};
                         token_stack.add(item);
+                        System.err.println("Erreur lexicale à la ligne " + line_number + " : caractère non reconnu '" + curr_car + "'");
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
@@ -166,7 +169,7 @@ public class Lexeur {
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"word", getAll(current_buffer)};
+                        String[] item = {"word", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
@@ -178,7 +181,7 @@ public class Lexeur {
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"number", getAll(current_buffer)};
+                        String[] item = {"number", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
@@ -186,14 +189,14 @@ public class Lexeur {
                     break;
                 case 8:
                     if (Character.valueOf(curr_car) == '=') {
-                        String[] item = {"relop", getAll(current_buffer)};
+                        String[] item = {"relop", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"relop", getAll(current_buffer)};
+                        String[] item = {"relop", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
@@ -201,14 +204,14 @@ public class Lexeur {
                     break;
                 case 11:
                     if (Character.valueOf(curr_car) == '=') {
-                        String[] item = {"relop", getAll(current_buffer)};
+                        String[] item = {"relop", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"op", getAll(current_buffer)};
+                        String[] item = {"op", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
@@ -216,30 +219,32 @@ public class Lexeur {
                     break;
                 case 14:
                     if (Character.valueOf(curr_car) == '=') {
-                        String[] item = {"relop", getAll(current_buffer)};
+                        String[] item = {"relop", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"error", "NR"};
+                        String[] item = {"error", "NR", String.valueOf(line_number)};
                         token_stack.add(item);
+                        System.err.println("Erreur lexicale à la ligne " + line_number + " : caractère non reconnu après '!'");
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
                     }
                     break;
                 case 25:
                     if (Character.valueOf(curr_car) == '/') {
-                        String[] item = {"op", "DIV"};
+                        String[] item = {"op", "DIV", String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"error", "NR"};
+                        String[] item = {"error", "NR", String.valueOf(line_number)};
                         token_stack.add(item);
+                        System.err.println("Erreur lexicale à la ligne " + line_number + " : caractère non reconnu après '/'");
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
                     }
@@ -252,7 +257,7 @@ public class Lexeur {
                         Lex(reader, 33, true, stop_lexing);
                     }
                     else {
-                        String[] item = {"string", getAll(current_buffer)};
+                        String[] item = {"string", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, true, stop_lexing);
@@ -270,7 +275,7 @@ public class Lexeur {
                     }
                     else {
                         current_buffer.remove(current_buffer.size() - 1);
-                        String[] item = {"com", getAll(current_buffer)};
+                        String[] item = {"com", getAll(current_buffer), String.valueOf(line_number)};
                         token_stack.add(item);
                         current_buffer = new ArrayList<>();
                         Lex(reader, 0, false, stop_lexing);
@@ -290,20 +295,21 @@ public class Lexeur {
                         if (indentation_counter > indentations_stack.get(ind_stack_len - 1)) {
                             indentations_stack.add(indentation_counter);
 
-                            String[] item = {"ws", "BEGIN"};
+                            String[] item = {"ws", "BEGIN", String.valueOf(line_number)};
                             token_stack.add(item);
                         }
                         else if (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
                             outerloop:
                             while (indentation_counter < indentations_stack.get(ind_stack_len - 1)) {
                                 if (indentations_stack.isEmpty()) {
-                                    String[] item = {"error", "IE"};
+                                    String[] item = {"error", "IE", String.valueOf(line_number)};
                                     token_stack.add(item);
+                                    System.err.println("Erreur lexicale à la ligne " + line_number + " : indentation incorrecte");
                                     break outerloop;
                                 }
                                 else {
                                     indentations_stack.remove(ind_stack_len - 1);
-                                    String[] item = {"ws", "END"};
+                                    String[] item = {"ws", "END", String.valueOf(line_number)};
                                     token_stack.add(item);
                                 }
 

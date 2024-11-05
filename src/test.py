@@ -1,6 +1,3 @@
-import math
-import os
-
 a = 10
 b = 20
 c = a + b
@@ -39,28 +36,3 @@ resultat = addition(a, b)
 print("Le résultat de l'addition est:", resultat)
 
 liste = [1, 2, 3, 4, 5]
-dictionnaire = {'a': 1, 'b': 2, 'c': 3}
-
-fonction_lambda = lambda x: x * 2\"
-print("Résultat de la fonc\"tion lambda:", fonction_lambda(a))
-
-def decorateur(func):
-    def wrapper():
-        print("Avant l'appel de la fonction")
-        func()
-        print("Après l'appel de la fonction")
-    return wrapper
-
-@decorateur
-def fonction():
-    print("Fonction")
-
-fonction()
-
-def generateur():
-    yield 1
-    yield 2
-    yield 3
-
-for valeur in generateur():
-    print("Valeur générée:", valeur)
