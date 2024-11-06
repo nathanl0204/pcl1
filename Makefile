@@ -1,22 +1,13 @@
-# Variables
-FILE_NAME = Lexeur
 
-# Chemin vers le fichier source et le fichier compilé
-SRC = src/$(FILE_NAME).java
-CLASS = build/$(FILE_NAME).class
+FILE_NAME = AST
+PACKAGE_NAME = AST
 
-# Règle par défaut
-all: $(CLASS)
+compil:
+	@mkdir -p build/$(PACKAGE_NAME)  # Créer le dossier pour le package
+	javac -d build/ -cp src/ src/$(PACKAGE_NAME)/*.java
 
-# Compiler le fichier .java en .class dans le dossier build/
-compil: $(SRC)
-	@mkdir -p build
-	javac -d build $(SRC)
+run:
+	java -cp build/ $(PACKAGE_NAME).$(FILE_NAME)
 
-# Exécuter le programme Java
-run: $(CLASS)
-	java -cp build $(FILE_NAME)
-
-# Supprimer les fichiers compilés dans build/
 clean:
-	rm -rf build
+	rm -rf build/*
