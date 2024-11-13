@@ -25,8 +25,8 @@ public class File extends Node{
         defs.addLast(def);
     }
 
-    public List<Def> getStmts(){
-        return this.defs;
+    public List<Stmt> getStmts(){
+        return this.stmts;
     }
 
     public void addStmts(Stmt stmt){
