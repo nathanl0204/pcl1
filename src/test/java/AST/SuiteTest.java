@@ -15,7 +15,7 @@ class SuiteTest {
     @Test
     void testAddStmt() {
         Suite suite = new Suite();
-        Stmt stmt = new If() {}; // Classe anonyme pour tester
+        Stmt stmt = new If();
         suite.addStmt(stmt);
         assertEquals(1, suite.getStmts().size(), "La liste des stmts devrait contenir un élément après l'ajout");
     }

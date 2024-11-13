@@ -1,8 +1,5 @@
 package AST.SimpleStmt.Expr.TermExpr;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-
 public class Ident extends TermExpr {
     private String name;
 
@@ -20,12 +17,5 @@ public class Ident extends TermExpr {
 
     public Ident simplify(){
         return this;
-    }
-
-
-    public void vizualisation(BufferedWriter writer,  String nodeName) throws IOException{
-        if (name != "") {
-            writer.write("  " + nodeName + " [label=\"" + name + "\"];\n");
-        }
     }
 }

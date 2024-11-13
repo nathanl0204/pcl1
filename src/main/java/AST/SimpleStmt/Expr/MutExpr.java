@@ -21,7 +21,7 @@ public class MutExpr extends AddExpr {
         return symbole;
     }
 
-    public void setSymbole(MutBinop symbole) {
+    public void setMutSymbole(MutBinop symbole) {
         this.symbole = symbole;
     }
 
@@ -56,8 +56,6 @@ public class MutExpr extends AddExpr {
             this.right.vizualisation(writer, rightNodeName); 
         }
     }
-
-    
 
     public MutExpr simplify(){
         this.left = left.simplify();
@@ -96,7 +94,7 @@ public class MutExpr extends AddExpr {
 
             MutExpr new_left = new MutExpr();
 
-            new_left.setSymbole(symbole);
+            new_left.setMutSymbole(symbole);
             symbole = right.getMutSymbole();
             new_left.setLeft(left);
             new_left.setRight(right.left);

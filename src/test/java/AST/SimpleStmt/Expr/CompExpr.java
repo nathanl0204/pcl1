@@ -22,7 +22,7 @@ public class CompExpr extends NotExpr {
         return symbole;
     }
 
-    public void setCompSymbole(CompBinop symbole) {
+    public void setSymbole(CompBinop symbole) {
         this.symbole = symbole;
     }
 
@@ -61,6 +61,8 @@ public class CompExpr extends NotExpr {
     }
     
     public CompExpr simplify() {
+        if (left == null && right == null) return null;
+
         if (left instanceof AddExpr) left.leftRotate();
         if (right instanceof AddExpr) right.leftRotate();
         if (left instanceof MutExpr) ((MutExpr) left).leftRotate();

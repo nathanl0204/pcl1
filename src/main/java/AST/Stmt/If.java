@@ -16,11 +16,11 @@ public class If extends Stmt {
         this.then = null; 
     }
 
-    public Expr getExpr() {
+    public Expr getIf() {
         return ifExpr;
     }
 
-    public void setExpr(Expr ifExpr) {
+    public void setIf(Expr ifExpr) {
         this.ifExpr = ifExpr;
     }
 

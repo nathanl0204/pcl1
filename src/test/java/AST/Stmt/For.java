@@ -5,7 +5,7 @@ import java.io.IOException;
 
 import AST.Suite;
 import AST.SimpleStmt.Expr.Expr;
-import AST.SimpleStmt.Expr.TermExpr.*;
+import AST.SimpleStmt.Expr.TermExpr.Ident;
 
 public class For {
     private Ident ident;

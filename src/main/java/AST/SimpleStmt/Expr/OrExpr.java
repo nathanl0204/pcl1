@@ -19,7 +19,7 @@ public class OrExpr extends Expr {
         return exprs;
     }
 
-    public void addExpr(AndExpr expr) {
+    public void addOrExpr(AndExpr expr) {
         this.exprs.add(expr);
     }
 

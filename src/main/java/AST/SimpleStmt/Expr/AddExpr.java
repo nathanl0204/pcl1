@@ -22,7 +22,7 @@ public class AddExpr extends CompExpr {
         return symbole;
     }
 
-    public void setSymbole(AddBinop symbole) {
+    public void setAddSymbole(AddBinop symbole) {
         this.symbole = symbole;
     }
 
@@ -64,7 +64,7 @@ public class AddExpr extends CompExpr {
             if (right.left instanceof MutExpr) ((MutExpr) right.left).leftRotate();
             AddExpr new_left = new AddExpr();
 
-            new_left.setSymbole(symbole);
+            new_left.setAddSymbole(symbole);
             symbole = right.getAddSymbole();
             new_left.setLeft(left);
             new_left.setRight(right.left);

@@ -19,7 +19,7 @@ public class AndExpr extends OrExpr {
         return exprs;
     }
 
-    public void addExpr(NotExpr expr) {
+    public void addAndExpr(NotExpr expr) {
         this.exprs.add(expr);
     }
 
@@ -42,7 +42,7 @@ public class AndExpr extends OrExpr {
         if (exprs.isEmpty()) return new Bool(true); 
 
         for (Expr expr : exprs) {
-            if (expr instanceof Bool && ((Bool)expr).getBool() ){
+            if (expr instanceof Bool && !((Bool)expr).getBool() ){
                 return new Bool(false); 
             }
         }
