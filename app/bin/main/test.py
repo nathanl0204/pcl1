@@ -1,14 +1,14 @@
 a = 10
 b = 20
 c = a + b
-d = a -b
+d = a -                               b
 e = a * b
 f = a / b
 f = a /// b
 g = a % b
 
 if a < b:
-    pr\"int#("a est plus petit que b")
+    p#r\"int(a est plus" petit que b)
         elif a >                           b:
     print("a est pl\"us grand que b")
 elif a >= b:

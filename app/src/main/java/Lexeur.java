@@ -359,7 +359,8 @@ public class Lexeur {
     public static void main(String[] args){
 
         try{
-            FileReader fileReader = new FileReader("src/test.py");
+            System.out.println("Répertoire courant : " + System.getProperty("user.dir"));
+            FileReader fileReader = new FileReader("src/main/resources/test.py");
         
             BufferedReader reader = new BufferedReader(fileReader);
 
