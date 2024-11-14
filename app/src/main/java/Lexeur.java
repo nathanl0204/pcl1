@@ -413,6 +413,9 @@ public class Lexeur {
         } catch (IOException e) {
 			e.printStackTrace();
 		}
-        Map<String, Map<String, String[]>> ll1_table = Parser.getLL1table(String.valueOf("ll1_table.html"));
+
+        Parser parser = new Parser();
+    
+        parser.print_ll1_table();
     }
 }
