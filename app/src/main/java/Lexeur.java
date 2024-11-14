@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Lexeur {
-    private static ArrayList<String[]> token_stack = new ArrayList<>();
-    private static ArrayList<Integer> indentations_stack = new ArrayList<>();
+    public static ArrayList<String[]> token_stack = new ArrayList<>();
+    public static ArrayList<Integer> indentations_stack = new ArrayList<>();
     private static int indentation_counter;
     private static int line_number = 1; // Ajout d'un compteur de ligne
 
@@ -359,7 +359,7 @@ public class Lexeur {
     public static void main(String[] args){
 
         try{
-            FileReader fileReader = new FileReader("src/test.py");
+            FileReader fileReader = new FileReader("src/main/resources/test.py");
         
             BufferedReader reader = new BufferedReader(fileReader);
 

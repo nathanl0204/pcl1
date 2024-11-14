@@ -18,7 +18,8 @@ repositories {
 
 dependencies {
     // This dependency is used by the application.
-    implementation libs.guava
+    //implementation libs.guava
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 }
 
 testing {
@@ -26,7 +27,8 @@ testing {
         // Configure the built-in test suite
         test {
             // Use JUnit4 test framework
-            useJUnit('4.13.2')
+            //useJUnit('4.13.2')
+            useJUnitJupiter()
         }
     }
 }

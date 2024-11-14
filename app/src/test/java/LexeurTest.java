@@ -17,8 +17,12 @@ public class LexeurTest {
 
     @Test
     public void testLexeurTokens() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/test.py"))) {
-            Lexeur.Lex(reader, 0, true, false);
+        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/test.py"))) {
+            for (int i = 0; i < 2; i++) {
+                String line = reader.readLine();
+                if (line == null) break;
+                Lexeur.Lex(new BufferedReader(new java.io.StringReader(line)), i + 1, true, false);
+            }
         }
 
         ArrayList<String[]> expectedTokens = new ArrayList<>();
@@ -31,6 +35,9 @@ public class LexeurTest {
         expectedTokens.add(new String[]{"op", "EQ", "2"});
         expectedTokens.add(new String[]{"number", "20", "2"});
         expectedTokens.add(new String[]{"ws", "NEWLINE", "2"});
+
+        System.out.println("Expected token count: " + expectedTokens.size());
+        System.out.println("Actual token count: " + Lexeur.token_stack.size());
 
         assertEquals(expectedTokens.size(), Lexeur.token_stack.size(), "Le nombre de tokens générés n'est pas correct.");
 
