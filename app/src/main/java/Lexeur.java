@@ -3,7 +3,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
 
 public class Lexeur {
     private static ArrayList<String[]> token_stack = new ArrayList<>();
@@ -25,6 +24,10 @@ public class Lexeur {
 
     public static void Lex(BufferedReader reader, int state, boolean does_read, boolean stop) throws IOException {
         if (stop) {
+            String[] pre_final_terminal = {"EOF", "EOF", "EOF"};
+            Lexeur.token_stack.add(pre_final_terminal);
+            String[] final_terminal = {"$", "$", "$"};
+            Lexeur.token_stack.add(final_terminal);
             return;
         }
 
@@ -414,8 +417,8 @@ public class Lexeur {
 			e.printStackTrace();
 		}
 
-        Parser parser = new Parser();
+        Parser parser = new Parser(Lexeur.token_stack);
     
-        parser.print_ll1_table();
+        
     }
 }

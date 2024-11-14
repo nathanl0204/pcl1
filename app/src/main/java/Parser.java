@@ -1,17 +1,25 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 public class Parser {
-    private String[][] rules;
+    private ArrayList<String[]> token_stack = new ArrayList<>();
     private String[] terminals;
     private String[] non_terminals;
     Map<String, Map<String, String[]>> ll1_table;
+    private ArrayList<String> errors_stack = new ArrayList<>();
+    private ArrayList<String> grammar_stack = new ArrayList<>();
+    private boolean reading_done;
     
-    
-    public Parser() {
+    public Parser(ArrayList<String[]> token_stack) {
         this.ll1_table = getLL1table();
+        this.token_stack = token_stack;
+        this.reading_done = false;
+        this.errors_stack = new ArrayList<>();
+        this.grammar_stack = new ArrayList<>();
+        this.grammar_stack.add("$");
+        this.grammar_stack.add("file");
     }
 
     public Map<String, Map<String, String[]>> getLL1table() {
@@ -25,7 +33,6 @@ public class Parser {
 
         this.non_terminals = non_terminals;
         this.terminals = terminals;
-        this.rules = rules;
 
         int ligns = non_terminals.length;
         int columns = terminals.length;
@@ -56,6 +63,134 @@ public class Parser {
             System.out.print("}\n");
         }
     }
+
+    public String[] getCurrentToken() {
+        return this.token_stack.get(this.token_stack.size() - 1);
+    }
     
+    public String getConvertedValue(String[] token) {
+        if (token[0].equals("$")) {
+            return "$";
+        }
+        if (token[0].equals("id")) {
+            return "ident";
+        }
+        else if (token[0].equals("keyword")) {
+            return token[1];
+        }
+        else if (token[0].equals("number")) {
+            return "integer";
+        }
+        else if (token[0].equals("string")) {
+            return "string";
+        }
+        else if (token[0].equals("op")) {
+            if (token[1].equals("LP")) {
+                return "(";
+            }
+            else if (token[1].equals("RP")) {
+                return ")";
+            }
+            else if (token[1].equals("LB")) {
+                return "[";
+            }
+            else if (token[1].equals("RB")) {
+                return "]";
+            }
+            else if (token[1].equals("MOD")) {
+                return "%";
+            }
+            else if (token[1].equals("DD")) {
+                return ":";
+            }
+            else if (token[1].equals("EQ")) {
+                return "=";
+            }
+            else if (token[1].equals("DIV")) {
+                return "//";
+            }
+            else if (token[1].equals("SUB")) {
+                return "-";
+            }
+            else if (token[1].equals("ADD")) {
+                return "+";
+            }
+            else if (token[1].equals("MULT")) {
+                return "*";
+            }
+            else {
+                return ",";
+            }
+        }
+        else if (token[0].equals("relop")) {
+            if (token[1].equals("LE")) {
+                return "<=";
+            }
+            else if (token[1].equals("GE")) {
+                return ">=";
+            }
+            else if (token[1].equals("LT")) {
+                return "<";
+            }
+            else if (token[1].equals("GT")) {
+                return ">";
+            }
+            else if (token[1].equals("EQ")) {
+                return "==";
+            }
+            else {
+                return "!=";
+            }
+        }
+        else { // case of ws
+            return token[1];
+        }
+    }
+
+    public boolean is_in_array(String[] array, String element) {
+        for (int i = 0; i<array.length; i++) {
+            if (array[i].equals(element)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void top_down_parsing_algorithm() {
+        while (!this.reading_done) {
+            String X = this.grammar_stack.get(0);
+            this.grammar_stack.remove(0);
+
+            String[] a = getCurrentToken();
+            
+            if (is_in_array(this.non_terminals, X)) {
+                String[] current_rule = this.ll1_table.get(X).get(getConvertedValue(a));
+                int terminal_length = current_rule.length;
+
+                if (terminal_length > 0) {
+                    for (int i = 0; i<terminal_length; i++) {
+                        this.grammar_stack.add(current_rule[terminal_length - 1 - i]);
+                    }
+                }
+                else {
+                    this.errors_stack.add("Impossible d'obtenir le token" + getConvertedValue(a).toString() + "dans cette situation (ligne" + a[2].toString() + ")");
+                }
+            }
+            else {
+                if (X.equals("$")) {
+                    if (getConvertedValue(a).equals("$")) {
+                        this.reading_done = true;
+                    }
+                    else {
+                        this.errors_stack.add("Le token " + getConvertedValue(a).toString() + "est de trop (ligne" + a[2].toString() + ")");
+                    }
+                }
+                else if (!X.equals(getConvertedValue(a))) {
+                    this.errors_stack.add(getConvertedValue(a).toString() + ": ce caractère n'est pas attendu à la ligne" + a[2].toString());
+                }
+                this.token_stack.remove(0);
+            }
+        }
+    }
 }
 
