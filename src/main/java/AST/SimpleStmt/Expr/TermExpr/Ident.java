@@ -10,6 +10,11 @@ public class Ident extends TermExpr {
         this.name = null;
     }
 
+    public Ident(String name) {
+        this.name = name;
+    }
+
+
     public String getName() {
         return name;
     }
@@ -21,7 +26,6 @@ public class Ident extends TermExpr {
     public Ident simplify(){
         return this;
     }
-
 
     public void vizualisation(BufferedWriter writer,  String nodeName) throws IOException{
         if (name != "") {

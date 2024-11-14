@@ -49,10 +49,15 @@ public class IdentP extends TermExpr {
         }
     }
 
-    public IdentP simplify(){
+    public TermExpr simplify(){
+        if (exprs == null) return null; 
         exprs = exprs.stream()
-                    .map(elt -> elt.simplify()) 
-                    .collect(Collectors.toList());  
+                     .map(elt -> elt.simplify()) 
+                     .collect(Collectors.toList());  
+
+        exprs.removeIf(elt -> elt == null);
+        if (exprs == null) return new Ident(ident.getName()); 
+        
         return this;
     }
 }

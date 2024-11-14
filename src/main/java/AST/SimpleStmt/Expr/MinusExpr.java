@@ -3,8 +3,7 @@ package AST.SimpleStmt.Expr;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import AST.SimpleStmt.Expr.TermExpr.Ident;
-import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
+import AST.SimpleStmt.Expr.TermExpr.TermExpr;
 
 public class MinusExpr extends MutExpr {
     private MinusExpr expr;
@@ -35,7 +34,8 @@ public class MinusExpr extends MutExpr {
         if (expr == null) return null;
         expr = expr.simplify();  
         if (expr == null) return this;
-        if (expr instanceof IntegerType || expr instanceof Ident) return this;
+
+        if (expr instanceof TermExpr) return this;
         if (expr instanceof MinusExpr) return this.expr.getMinusExpr();
         
         return this;

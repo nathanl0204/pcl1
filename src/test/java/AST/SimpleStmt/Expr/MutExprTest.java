@@ -79,7 +79,7 @@ class MutExprTest {
     @Test
     void testSimplifyWithBoolAndInteger() {
         MutExpr mutExpr = new MutExpr();
-        Bool left = new Bool(true);  // true = 1
+        BoolType left = new BoolType(true);  // true = 1
         IntegerType right = new IntegerType(2);
         mutExpr.setLeft(left);
         mutExpr.setRight(right);
@@ -94,7 +94,7 @@ class MutExprTest {
     void testSimplifyWithIntegerAndBool() {
         MutExpr mutExpr = new MutExpr();
         IntegerType left = new IntegerType(10);
-        Bool right = new Bool(false);  // false = 0
+        BoolType right = new BoolType(false);  // false = 0
         mutExpr.setLeft(left);
         mutExpr.setRight(right);
         mutExpr.setMutSymbole(MutBinop.MULT);

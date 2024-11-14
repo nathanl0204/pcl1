@@ -63,22 +63,22 @@ class NotExprTest {
     @Test
     void testSimplifyWithTrue() {
         NotExpr notExpr = new NotExpr();
-        notExpr.setNotExpr(new Bool(true));
+        notExpr.setNotExpr(new BoolType(true));
 
         NotExpr simplified = notExpr.simplify();
         
-        assertTrue(simplified instanceof Bool);
-        assertFalse(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertFalse(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithFalse() {
         NotExpr notExpr = new NotExpr();
-        notExpr.setNotExpr(new Bool(false));
+        notExpr.setNotExpr(new BoolType(false));
 
         NotExpr simplified = notExpr.simplify();
         
-        assertTrue(simplified instanceof Bool);
-        assertTrue(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertTrue(((BoolType) simplified).getValue());
     }
 }

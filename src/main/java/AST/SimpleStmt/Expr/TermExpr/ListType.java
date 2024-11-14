@@ -34,9 +34,14 @@ public class ListType extends TermExpr {
     }
 
     public ListType simplify() {
+        if (exprs == null) return null; 
         exprs = exprs.stream()
                      .map(elt -> elt.simplify()) 
                      .collect(Collectors.toList());  
+
+        exprs.removeIf(elt -> elt == null);
+        if (exprs == null) return null; 
+        
         return this;
     }
 

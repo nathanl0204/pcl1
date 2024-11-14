@@ -51,7 +51,7 @@ class AddExprTest {
     @Test
     void testSimplifyWithBoolAndInteger() {
         AddExpr addExpr = new AddExpr();
-        Bool left = new Bool(true);  // true = 1
+        BoolType left = new BoolType(true);  // true = 1
         IntegerType right = new IntegerType(2);
         addExpr.setLeft(left);
         addExpr.setRight(right);
@@ -66,7 +66,7 @@ class AddExprTest {
     void testSimplifyWithIntegerAndBool() {
         AddExpr addExpr = new AddExpr();
         IntegerType left = new IntegerType(10);
-        Bool right = new Bool(false);  // false = 0
+        BoolType right = new BoolType(false);  // false = 0
         addExpr.setLeft(left);
         addExpr.setRight(right);
         addExpr.setAddSymbole(AddBinop.SUB);

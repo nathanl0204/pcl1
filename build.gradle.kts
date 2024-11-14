@@ -11,18 +11,16 @@ plugins {
 }
 
 repositories {
-    mavenCentral()  // Dépôt Maven Central pour les dépendances
+    mavenCentral()
 }
 
 dependencies {
-    // Dépendances pour JUnit Jupiter (JUnit 5)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 
-    // Dépendances pour le code de production (ajoutez celles dont vous avez besoin)
-    implementation("org.apache.commons:commons-lang3:3.12.0")  // Exemple
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 }
 
 tasks.test {
-    useJUnitPlatform()  // Utilise JUnit 5 pour les tests
+    useJUnitPlatform() 
 }

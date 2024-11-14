@@ -3,9 +3,9 @@
         - File root
     }
 
-    abstract class Node {
-        + {abstract} void vizualisation(BufferedWriter writer,  String nodeName) throws IOException
-        + {abstract} Node simplify()
+    interface Node {
+        + void vizualisation(BufferedWriter writer,  String nodeName) throws IOException
+        + Node simplify()
     }
 
     class File extends Node { 
@@ -121,21 +121,21 @@
         - List<AndExpr> exprs
         + OrExpr()
         + List<AndExpr> getOrExprs()
-        + void addExpr(AndExpr expr)
+        + void addOrExpr(AndExpr expr)
     }
 
     class AndExpr extends OrExpr{
         - List<NotExpr> exprs
         + AndExpr()
         + List<NotExpr> getAndExprs()
-        + void addExpr(NotExpr expr)
+        + void addAndExpr(NotExpr expr)
     }
     
     class NotExpr extends AndExpr {
         - NotExpr expr
         + NotExpr()
         + NotExpr getNotExpr()
-        + void setExpr(NotExpr expr) 
+        + void setNotExpr(NotExpr expr) 
     }
 
     class CompExpr extends NotExpr {
@@ -144,7 +144,7 @@
         - AddExpr right
         + CompExpr()
         + CompBinop getCompSymbole()
-        + void setSymbole(CompBinop symbole)
+        + void setCompSymbole(CompBinop symbole)
         + AddExpr getLeft()
         + void setLeft(AddExpr left)
         + AddExpr getRight()
@@ -172,7 +172,7 @@
         - AddExpr right
         + AddExpr()
         + AddBinop getAddSymbole()
-        + void setSymbole(AddBinop symbole)
+        + void setAddSymbole(AddBinop symbole)
         + AddExpr getLeft()
         + void setLeft(AddExpr left)
         + AddExpr getRight()
@@ -192,7 +192,7 @@
         - MutExpr right
         + MutExpr()
         + MutBinop getMutSymbole()
-        + void setSymbole(MutBinop symbole)
+        + void setMutSymbole(MutBinop symbole)
         + MutExpr getLeft()
         + void setLeft(MutExpr left)
         + MutExpr getRight()
@@ -210,8 +210,8 @@
     class MinusExpr extends MutExpr  {
         - MinusExpr expr
         + MinusExpr()
-        + MinusExpr getExpr()
-        + void setExpr(MinusExpr expr) 
+        + MinusExpr getMinusExpr()
+        + void setMinusExpr(MinusExpr expr) 
     }
 
     abstract class TermExpr extends MinusExpr
@@ -229,6 +229,7 @@
     class Ident extends TermExpr {
         - String name
         + Ident()
+        + Ident(String name)
         + String getName()
         + void setName(String name)
     }
@@ -246,33 +247,33 @@
         + Expr getExpr()
         + void setExpr(Expr expr)
     }
-
+    
     abstract class Const extends TermExpr 
-
+  
     class IntegerType extends Const {
         - int value
-        + Integer()
-        + Integer(int value)
+        + IntegerType()
+        + IntegerType(int value)
         + int getValue()
         + void setValue(int value)
     }
 
     class StringType extends Const {
         - String value
-        + String()
-        + String(String value)
+        + StringType()
+        + StringType(String value)
         + String getValue()
         + void setValue(int value)
     }
 
-    class Bool extends Const {
+    class BoolType extends Const {
         - boolean value
-        + Bool()
-        + Bool(boolean value)
+        + BoolType()
+        + BoolType(boolean value)
         + boolean getBool()
         + void setBool(boolean value)
     }
 
-    class None extends Const
+    class NoneType extends Const
 
 @enduml

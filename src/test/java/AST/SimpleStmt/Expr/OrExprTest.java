@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
-import AST.SimpleStmt.Expr.TermExpr.Const.Bool;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 
 class OrExprTest {
 
@@ -32,43 +32,43 @@ class OrExprTest {
         OrExpr orExpr = new OrExpr();
         OrExpr simplified = orExpr.simplify();
         
-        assertTrue(simplified instanceof Bool);
-        assertFalse(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertFalse(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithTrue() {
         OrExpr orExpr = new OrExpr();
         orExpr.addOrExpr(new AndExpr());
-        orExpr.addOrExpr(new Bool(true));
+        orExpr.addOrExpr(new BoolType(true));
 
         OrExpr simplified = orExpr.simplify();
 
-        assertTrue(simplified instanceof Bool);
-        assertTrue(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertTrue(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithFalse() {
         OrExpr orExpr = new OrExpr();
-        orExpr.addOrExpr(new Bool(false));
-        orExpr.addOrExpr(new Bool(false));
+        orExpr.addOrExpr(new BoolType(false));
+        orExpr.addOrExpr(new BoolType(false));
 
         OrExpr simplified = orExpr.simplify();
 
-        assertTrue(simplified instanceof Bool);
-        assertFalse(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertFalse(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithTrueAndFalse() {
         OrExpr orExpr = new OrExpr();
-        orExpr.addOrExpr(new Bool(true));
-        orExpr.addOrExpr(new Bool(false));
+        orExpr.addOrExpr(new BoolType(true));
+        orExpr.addOrExpr(new BoolType(false));
 
         OrExpr simplified = orExpr.simplify();
 
-        assertTrue(simplified instanceof Bool);
-        assertTrue(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertTrue(((BoolType) simplified).getValue());
     }
 }

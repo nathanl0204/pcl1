@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 
-import AST.SimpleStmt.Expr.TermExpr.Const.Bool;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 
 class AndExprTest {
 
@@ -32,27 +32,27 @@ class AndExprTest {
         AndExpr andExpr = new AndExpr();
         AndExpr simplified = andExpr.simplify();
         
-        assertTrue(simplified instanceof Bool);
-        assertTrue(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertTrue(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithFalse() {
         AndExpr andExpr = new AndExpr();
-        andExpr.addAndExpr(new Bool(false));
-        andExpr.addAndExpr(new Bool(true));
+        andExpr.addAndExpr(new BoolType(false));
+        andExpr.addAndExpr(new BoolType(true));
 
         AndExpr simplified = andExpr.simplify();
 
-        assertTrue(simplified instanceof Bool);
-        assertFalse(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertFalse(((BoolType) simplified).getValue());
     }
 
     @Test
     void testSimplifyWithTrue() {
         AndExpr andExpr = new AndExpr();
-        andExpr.addAndExpr(new Bool(true));
-        andExpr.addAndExpr(new Bool(true));
+        andExpr.addAndExpr(new BoolType(true));
+        andExpr.addAndExpr(new BoolType(true));
 
         AndExpr simplified = andExpr.simplify();
 
@@ -62,12 +62,12 @@ class AndExprTest {
     @Test
     void testSimplifyWithTrueAndFalse() {
         AndExpr andExpr = new AndExpr();
-        andExpr.addAndExpr(new Bool(true));
-        andExpr.addAndExpr(new Bool(false));
+        andExpr.addAndExpr(new BoolType(true));
+        andExpr.addAndExpr(new BoolType(false));
 
         AndExpr simplified = andExpr.simplify();
 
-        assertTrue(simplified instanceof Bool);
-        assertFalse(((Bool) simplified).getBool());
+        assertTrue(simplified instanceof BoolType);
+        assertFalse(((BoolType) simplified).getValue());
     }
 }
