@@ -3,6 +3,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 public class Lexeur {
     private static ArrayList<String[]> token_stack = new ArrayList<>();
@@ -359,7 +360,6 @@ public class Lexeur {
     public static void main(String[] args){
 
         try{
-            System.out.println("Répertoire courant : " + System.getProperty("user.dir"));
             FileReader fileReader = new FileReader("src/main/resources/test.py");
         
             BufferedReader reader = new BufferedReader(fileReader);
@@ -413,8 +413,6 @@ public class Lexeur {
         } catch (IOException e) {
 			e.printStackTrace();
 		}
-       
+        Map<String, Map<String, String[]>> ll1_table = Parser.getLL1table(String.valueOf("ll1_table.html"));
     }
-
-            
 }
