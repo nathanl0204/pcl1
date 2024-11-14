@@ -57,8 +57,8 @@ public class AST {
 
 
         MutExpr mut2 = new MutExpr();
-        mut2.setRight(new IntegerType(40));
-        mut2.setLeft(new IntegerType(30));
+        mut2.setRight(new IntegerType(30));
+        mut2.setLeft(new IntegerType(40));
         mut2.setMutSymbole(MutBinop.DIV);
         
         MutExpr mut1 = new MutExpr();
@@ -100,10 +100,11 @@ public class AST {
         
         AST ast = new AST();
         ast.root = new File();
+
         //expr.leftRotate();
+        expr = expr.simplify();
+
         ast.root.addStmts(expr);
-
         ast.vizualisation();
-
     }
 }

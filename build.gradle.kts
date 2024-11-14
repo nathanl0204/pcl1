@@ -8,6 +8,7 @@
 
 plugins {
     id("java")
+    id("application")
 }
 
 repositories {
@@ -22,5 +23,9 @@ dependencies {
 }
 
 tasks.test {
-    useJUnitPlatform() 
+    useJUnitPlatform()
+}
+
+application{
+    mainClass = "AST.AST"
 }
