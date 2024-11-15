@@ -314,7 +314,10 @@ public class Lexeur {
                                 else {
                                     indentations_stack.remove(ind_stack_len - 1);
                                     String[] item = {"ws", "END", String.valueOf(line_number)};
+                                    String[] last_item = token_stack.get(token_stack.size() - 1);
+                                    token_stack.remove(token_stack.size() - 1);
                                     token_stack.add(item);
+                                    token_stack.add(last_item);
                                 }
 
                                 ind_stack_len = indentations_stack.size();
@@ -380,37 +383,37 @@ public class Lexeur {
                 
                 if (item[0].equals(String.valueOf("word"))) {
                     if (is_in(item[1], keywords)) {
-                        String[] new_item = {"keyword", item[1]};
+                        String[] new_item = {"keyword", item[1], item[2]};
                         token_stack.set(i, new_item);
                     }
                     else {
-                        String[] new_item = {"id", item[1]};
+                        String[] new_item = {"id", item[1], item[2]};
                         token_stack.set(i, new_item);
                     }
                 }
                 else if (item[1].equals("==")) {
-                    String[] new_item = {item[0], "EQ"};
+                    String[] new_item = {item[0], "EQ", item[2]};
                     token_stack.set(i, new_item);
                 }
                 else if (item[1].equals("=")) {
-                    String[] new_item = {item[0], "EQ"};
+                    String[] new_item = {item[0], "EQ", item[2]};
                     token_stack.set(i, new_item);
                 }
                 else if (item[1].equals("!=")) {
-                    String[] new_item = {item[0], "NE"};
+                    String[] new_item = {item[0], "NE", item[2]};
                     token_stack.set(i, new_item);
                 }
                 else if (item[1].equals("<")) {
-                    String[] new_item = {item[0], "LT"};
+                    String[] new_item = {item[0], "LT", item[2]};
                     token_stack.set(i, new_item);
                 }
                 else if (item[1].equals(">")) {
-                    String[] new_item = {item[0], "GT"};
+                    String[] new_item = {item[0], "GT", item[2]};
                     token_stack.set(i, new_item);
                 }
             }
 
-            print_tokens(token_stack);
+            //print_tokens(token_stack);
 
             reader.close();
         } catch (IOException e) {
@@ -419,6 +422,7 @@ public class Lexeur {
 
         Parser parser = new Parser(Lexeur.token_stack);
     
-        
+        parser.top_down_parsing_algorithm();
+        //parser.getTree().show(true);
     }
 }

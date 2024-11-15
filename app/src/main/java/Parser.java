@@ -11,6 +11,7 @@ public class Parser {
     private ArrayList<String> errors_stack = new ArrayList<>();
     private ArrayList<String> grammar_stack = new ArrayList<>();
     private boolean reading_done;
+    private Tree tree;
     
     public Parser(ArrayList<String[]> token_stack) {
         this.ll1_table = getLL1table();
@@ -65,7 +66,11 @@ public class Parser {
     }
 
     public String[] getCurrentToken() {
-        return this.token_stack.get(this.token_stack.size() - 1);
+        return this.token_stack.get(0);
+    }
+
+    public Tree getTree() {
+        return this.tree;
     }
     
     public String getConvertedValue(String[] token) {
@@ -156,39 +161,97 @@ public class Parser {
         return false;
     }
 
+    public void remove_unecessary_tokens() {
+        for (int i = 0; i<this.token_stack.size(); i++) {
+            if (this.token_stack.get(i)[0].equals("error") || this.token_stack.get(i)[0].equals("com")) {
+                this.token_stack.remove(i);
+            }
+        }
+    }
+
+    public void get_tokens_to_next_lign(String last_line_creator) {
+        String current_token = getConvertedValue(this.token_stack.get(0));
+
+        while (current_token != "NEWLINE") {
+            this.token_stack.remove(0);
+            current_token = getConvertedValue(this.token_stack.get(0));
+        }
+    }
+
+    public void get_rules_to_previous_line_creator(String last_line_creator) {
+        if (!last_line_creator.equals("NEWLINE")){
+            String current_rule = this.grammar_stack.get(this.grammar_stack.size() - 1);
+            System.out.println(last_line_creator);
+
+            while (!current_rule.equals(last_line_creator)) {
+                System.out.println(current_rule);
+                System.out.println(last_line_creator);
+                this.grammar_stack.remove(this.grammar_stack.size() - 1);
+                current_rule = this.grammar_stack.get(this.grammar_stack.size() - 1);
+            }
+        }
+    }
+    
     public void top_down_parsing_algorithm() {
+        this.remove_unecessary_tokens();
+
         while (!this.reading_done) {
-            String X = this.grammar_stack.get(0);
-            this.grammar_stack.remove(0);
+            String X = this.grammar_stack.get(this.grammar_stack.size() - 1);
+            this.grammar_stack.remove(this.grammar_stack.size() - 1);
 
             String[] a = getCurrentToken();
-            
+
+            System.out.print(X.toString() + " | " + Arrays.toString(a) + " | ");
+
             if (is_in_array(this.non_terminals, X)) {
-                String[] current_rule = this.ll1_table.get(X).get(getConvertedValue(a));
+                String[] current_rule;
+
+                if (X.equals("simple_stmt") && getConvertedValue(a).equals("ident")) {
+                    if (getConvertedValue(this.token_stack.get(1)).equals("=")) {
+                        current_rule = new String[]{"ident", "=", "expr"};
+                    } else {
+                        current_rule = new String[]{"or_expr", "simple_stmt_fact"};
+                    }
+                } else {
+                    current_rule = this.ll1_table.get(X).get(getConvertedValue(a));
+                }
+
+
                 int terminal_length = current_rule.length;
 
                 if (terminal_length > 0) {
-                    for (int i = 0; i<terminal_length; i++) {
-                        this.grammar_stack.add(current_rule[terminal_length - 1 - i]);
+                    if (!current_rule[0].equals("ε")) {
+                        for (int i = 0; i<terminal_length; i++) {
+                            String node = current_rule[terminal_length - 1 - i];
+                            this.grammar_stack.add(node);
+                        }
+    
+                        System.out.println(X.toString() + " -> " + Arrays.toString(current_rule));
+                    }
+                    else {
+                        System.out.println("On ne fait rien (epsilon)");
                     }
                 }
                 else {
-                    this.errors_stack.add("Impossible d'obtenir le token" + getConvertedValue(a).toString() + "dans cette situation (ligne" + a[2].toString() + ")");
+                    this.errors_stack.add("Expression invalide ligne " + a[2].toString());
+                    System.out.println("On skip ce non terminal: " + X.toString());
                 }
             }
             else {
                 if (X.equals("$")) {
-                    if (getConvertedValue(a).equals("$")) {
-                        this.reading_done = true;
-                    }
-                    else {
+                    if (!getConvertedValue(a).equals("$")) {
                         this.errors_stack.add("Le token " + getConvertedValue(a).toString() + "est de trop (ligne" + a[2].toString() + ")");
                     }
+                    this.reading_done = true;
                 }
                 else if (!X.equals(getConvertedValue(a))) {
                     this.errors_stack.add(getConvertedValue(a).toString() + ": ce caractère n'est pas attendu à la ligne" + a[2].toString());
+                    System.out.println("On skip ce token: " + X.toString());
                 }
-                this.token_stack.remove(0);
+                else {
+                    this.token_stack.remove(0);
+                    System.out.println("On écrit le token: " + Arrays.toString(a));
+                }
             }
         }
     }
