@@ -22,7 +22,7 @@ public class File extends Node{
     }
 
     public void addDefs(Def def){
-        defs.addLast(def);
+        defs.add(def);
     }
 
     public List<Def> getStmts(){
@@ -30,7 +30,7 @@ public class File extends Node{
     }
 
     public void addStmts(Stmt stmt){
-        stmts.addLast(stmt);
+        stmts.add(stmt);
     }
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {

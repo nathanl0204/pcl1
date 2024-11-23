@@ -6,24 +6,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import AST.Ident;
 import AST.SimpleStmt.Expr.Expr;
 
-public class IdentP extends TermExpr {
-    private Ident ident;
+public class ListType extends TermExpr {
     private List<Expr> exprs;
 
-    public IdentP() {
-        this.ident = null;
+    public ListType() {
         this.exprs = new ArrayList<Expr>();
-    }
-
-    public Ident getIdent() {
-        return ident;
-    }
-
-    public void setIdent(Ident ident) {
-        this.ident = ident;
     }
 
     public List<Expr> getExprs() {
@@ -31,17 +20,11 @@ public class IdentP extends TermExpr {
     }
 
     public void addExprs(Expr expr) {
-        this.exprs.addLast(expr);
+        this.exprs.add(expr);
     }
-    
-    public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\"IDENT\"];\n");
 
-        if (ident != null ){
-            String identNodeName = nodeName + "_" + ident.hashCode(); 
-            writer.write("  " + nodeName + " -- " + identNodeName + ";\n");
-            ident.vizualisation(writer,identNodeName); 
-        }
+    public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
+        writer.write("  " + nodeName + " [label=\"LIST\"];\n");
 
         for (Expr expr : exprs){
             String exprNodeName = nodeName + "_" + expr.hashCode(); 
@@ -50,10 +33,11 @@ public class IdentP extends TermExpr {
         }
     }
 
-    public IdentP simplify(){
+    public ListType simplify() {
         exprs = exprs.stream()
-                    .map(elt -> elt.simplify()) 
-                    .collect(Collectors.toList());  
+                     .map(elt -> elt.simplify()) 
+                     .collect(Collectors.toList());  
         return this;
     }
+
 }

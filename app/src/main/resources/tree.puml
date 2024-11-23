@@ -1,7 +1,0 @@
-@startuml
-[*] --> file
-file --> EOF
-file --> stmt_plus
-file --> def_etoile
-file --> opt_newline
-@enduml
