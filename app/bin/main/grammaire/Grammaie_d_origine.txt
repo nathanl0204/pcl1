@@ -1,0 +1,51 @@
+Grammaire d'origine :
+
+<file> ::= <newline_?> NEWLINE? <def_*> <stmt_+> EOF
+ 
+<newline_?> := ε | NEWLINE
+
+<def_*> := ε | <def> <def_*>
+
+<stmt_+> := <stmt> <stmt_+_fact>
+<stmt_+_fact> = ε | <stmt_+>
+
+<def> ::= def <ident> ( <ident_*_,> ) : <suite>
+
+<ident_*_,> := ε | <ident_+_,>
+<ident_+_,> :=  <ident> <ident_+_,_fact>
+<ident_+_,_fact> := ε | , <ident_+_,>
+
+<suite> ::= <simple_stmt> NEWLINE
+            | NEWLINE BEGIN <stmt_+> END
+
+<simple_stmt> ::= return <expr>
+                | <ident> = <expr>
+                | <expr> [ <expr> ] = <expr>
+                | print ( <expr> )
+                | <expr>
+
+<stmt> ::= <simple_stmt> NEWLINE
+        | if <expr> : <suite>
+        | if <expr> : <suite> else : <suite>
+        | for <ident> in <expr> : <suite>
+
+<expr> ::= <const>
+        | <ident>
+        | <expr> [ <expr> ]
+        | - <expr>
+        | not <expr>
+        | <expr> <binop> <expr>
+        | <ident> ( <expr_*_,> )
+        | [ <expr_*_,> ]
+        | ( <expr> )
+
+<expr_*_,> := ε | <expr_+_,>
+<expr_+_,> :=  <expr> <expr_+_,_fact>
+<expr_+_,_fact> := ε | , <expr_+_,>
+
+
+<binop> ::= + | - | * | // | % | <= | >= | > | < | != | ==
+        | and | or
+
+<const> ::= <integer> | <string> | True | False | None 
+
