@@ -4,7 +4,7 @@ public class Main {
     public static void main(String[] args) {
         
         if (args.length != 2 || (!args[0].equals("Lexer") && !args[0].equals("Parser"))){
-
+            System.out.println("Signature Args=Lexer|Parser FilePath");
         }
         else {
             //"src/main/resources/test.py"
