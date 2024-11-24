@@ -1,0 +1,5 @@
+graph AST {
+  root [label="File"];
+  root -- root_1300109446;
+  root_1300109446 [label="6"];
+}
