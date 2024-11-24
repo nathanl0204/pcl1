@@ -363,10 +363,10 @@ public class Lexeur {
     }
 
 
-    public static void main(String[] args){
+    public static void execute(String filePath){
 
         try{
-            FileReader fileReader = new FileReader("src/main/resources/test.py");
+            FileReader fileReader = new FileReader(filePath);
         
             BufferedReader reader = new BufferedReader(fileReader);
 
@@ -419,11 +419,5 @@ public class Lexeur {
         } catch (IOException e) {
 			e.printStackTrace();
 		}
-
-        Parser parser = new Parser(Lexeur.token_stack);
-    
-        parser.top_down_parsing_algorithm();
-        //parser.getTree().show(true);
-
     }
 }
