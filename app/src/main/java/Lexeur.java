@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import AST.*;
+import ANALYSE.*;
 import AST.SimpleStmt.Expr.AddBinop;
 import AST.SimpleStmt.Expr.AddExpr;
 import AST.SimpleStmt.Expr.MutBinop;
@@ -420,17 +421,23 @@ public class Lexeur {
                 }
             }
 
-            //print_tokens(token_stack);
+            print_tokens(token_stack);
 
             reader.close();
         } catch (IOException e) {
 			e.printStackTrace();
 		}
 
-        Parser parser = new Parser(Lexeur.token_stack);
-    
-        parser.top_down_parsing_algorithm();
-        //parser.getTree().show(true);
+        AnalyseFile analyseFile = new AnalyseFile(token_stack);
+
+        try {
+            // Lancer l'analyse
+            analyseFile.Analyse();
+            System.out.println("Analyse terminée avec succès !");
+        } catch (AnalyseException e) {
+            // Gestion des erreurs
+            System.err.println("Erreur lors de l'analyse : " + e.getMessage());
+        }
 
 
         // test AST
