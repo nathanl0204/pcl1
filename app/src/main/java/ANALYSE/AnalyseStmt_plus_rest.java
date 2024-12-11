@@ -17,7 +17,7 @@ public class AnalyseStmt_plus_rest{
 
         if (token_stack.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
-    }
+        }
 
         String[] currentTokenArray = convert.getCurrentToken(this.token_stack);
         String currentToken = convert.getConvertedValue(currentTokenArray);

@@ -4,12 +4,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import ANALYSE.AnalyseDef_etoile;
 import ANALYSE.AnalyseException;
-import ANALYSE.AnalyseOpt_newline;
-import ANALYSE.AnalyseStmt;
-import ANALYSE.AnalyseStmt_plus;
-import ANALYSE.AnalyseStmt_plus_rest;
 import ANALYSE.ConvertToken;
 
 import AST.Node;
@@ -31,7 +26,6 @@ public class ParserV2 {
         
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
         
-
         if (validetoken.contains(currentValue)){
 
             AnalyseOptNewline();
@@ -853,7 +847,7 @@ public class ParserV2 {
         }
         else if (currentValue.equals(")")){
             return;
-        }
+        } 
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
         }
@@ -1003,4 +997,3 @@ public class ParserV2 {
 
     }
 }
-
