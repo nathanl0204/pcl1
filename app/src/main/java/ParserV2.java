@@ -4,7 +4,12 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import ANALYSE.AnalyseDef_etoile;
 import ANALYSE.AnalyseException;
+import ANALYSE.AnalyseOpt_newline;
+import ANALYSE.AnalyseStmt;
+import ANALYSE.AnalyseStmt_plus;
+import ANALYSE.AnalyseStmt_plus_rest;
 import ANALYSE.ConvertToken;
 
 import AST.Node;
@@ -22,39 +27,103 @@ public class ParserV2 {
     }
     
     private void AnalyseFile(Node parent){
-        AnalyseOptNewline();
-        AnalyseDefEtoile(parent);
-        AnalyseStmt(parent);
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+        
+        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        
+
+        if (validetoken.contains(currentValue)){
+
+            AnalyseOptNewline();
+            AnalyseDefEtoile(parent);
+            AnalyseStmtPlus(parent);
+
+            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+            if(currentValue.equals("EOF")){
+                System.out.println("MOT RECONNUE | AUCUN PROBLEME");
+                return;
+            }
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+        }
     }
 
     private void AnalyseOptNewline(){
-        String tokenValue = convertToken.getConvertedValue(tokenQueue.peek());
-        if (tokenValue.equals("NEWLINE")){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+
+        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        if (currentValue.equals("NEWLINE")){
             tokenQueue.poll();
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
         }
     }
 
     private void AnalyseDefEtoile(Node parent){
-        String tokenValue = convertToken.getConvertedValue(tokenQueue.peek());
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
-        if (tokenValue.equals("def")){
+        if (currentValue.equals("def")){
             AnalyseDeft(parent);
             AnalyseDefEtoile(parent);
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
         }
         
     }
 
     private void AnalyseStmtPlus(Node parent){
-        AnalyseStmt(parent);
-        AnalyseStmtPlusRest(parent);
+        ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+
+        if (validetoken.contains(currentValue)){
+            AnalyseStmt(parent);
+            AnalyseStmtPlusRest(parent);
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+        }
     }
 
     private void AnalyseStmtPlusRest(Node parent){
-        AnalyseStmt(parent);
-        AnalyseStmtPlusRest(parent);
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList( "EOF","END")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        
+        if (validetoken.contains(currentValue)){
+            AnalyseStmtPlus(parent);
+        }
+        else if (validetoken1.contains(currentValue)){
+            return;
+        }   
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+        }
     }
 
     private void AnalyseDeft(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (currentValue.equals("def")){
@@ -98,6 +167,10 @@ public class ParserV2 {
     }
 
     private void AnalyseIdentEtoileVirgule(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("ident")){
@@ -113,6 +186,10 @@ public class ParserV2 {
     }
 
     private void AnalyseIdentPlusVirgule(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("ident")){
@@ -125,6 +202,10 @@ public class ParserV2 {
     }
 
     private void AnalyseIdentPlusVirguleRest(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals(")")){
@@ -140,6 +221,10 @@ public class ParserV2 {
     }
 
     private void AnalyseSuite(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
 
@@ -187,6 +272,10 @@ public class ParserV2 {
     }
 
     private void AnalyseSimpleStmt(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
@@ -244,6 +333,10 @@ public class ParserV2 {
     }
 
     private void AnalyseSimpleStmtFact(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "NEWLINE","=")) ;
 
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
@@ -274,6 +367,10 @@ public class ParserV2 {
     }
 
     private void AnalyseSimpleStmtFactFact(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("=")){
@@ -292,6 +389,10 @@ public class ParserV2 {
     private void AnalyseStmt(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
     
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -364,6 +465,10 @@ public class ParserV2 {
     private void AnalyseStmtElse(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("else")){
@@ -391,6 +496,10 @@ public class ParserV2 {
     private void AnalyseExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -405,6 +514,10 @@ public class ParserV2 {
 
     private void AnalyseExprCrochetEtoile(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
         
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
@@ -431,6 +544,10 @@ public class ParserV2 {
     private void AnalyseOrExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
         
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -445,6 +562,10 @@ public class ParserV2 {
     private void AnalyseOrExprRest(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("or")){
@@ -462,6 +583,10 @@ public class ParserV2 {
     private void AnalyseAndExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -476,6 +601,10 @@ public class ParserV2 {
     private void AnalyseAndExprRest(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("and")){
@@ -493,6 +622,10 @@ public class ParserV2 {
     private void AnalyseNotExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -510,6 +643,10 @@ public class ParserV2 {
     private void AnalyseCompExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -525,6 +662,10 @@ public class ParserV2 {
         final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]")) ;
         final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken2.contains(currentValue)){
@@ -540,7 +681,11 @@ public class ParserV2 {
     }
 
     private void AnalyseAddExpr(Node parent){
-        ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
         
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
         
@@ -557,6 +702,10 @@ public class ParserV2 {
     private void AnalyseAddExprRest(Node parent){
         final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==")) ;
         final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("-","+")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
         
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
         
@@ -575,6 +724,10 @@ public class ParserV2 {
     private void AnalyseMutExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
         
         if (validetoken.contains(currentValue)){
@@ -590,6 +743,10 @@ public class ParserV2 {
         final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-")) ;
         final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("*","//","%")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken2.contains(currentValue)){
@@ -607,6 +764,10 @@ public class ParserV2 {
     private void AnalyseTerminalExpr(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("ident")){
@@ -652,6 +813,10 @@ public class ParserV2 {
     private void AnalyseExprRestIdent(Node parent){
         final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-","*","//","%")) ;
 
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("(")){
@@ -677,6 +842,10 @@ public class ParserV2 {
 
     private void AnalyseExprEtoileVirgule(Node parent){
         
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals("ident")){
@@ -693,6 +862,10 @@ public class ParserV2 {
     private void AnalyseExprPlusVirgule(Node parent){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
         
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (validetoken.contains(currentValue)){
@@ -705,6 +878,10 @@ public class ParserV2 {
     }
 
     private void AnalyseExprPlusVirguleRest(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+
         String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
 
         if (currentValue.equals(",")){
@@ -720,7 +897,10 @@ public class ParserV2 {
     }
 
     private void AnalyseBinopAdd(Node parent){
-
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (currentValue.equals("+")){
@@ -735,6 +915,10 @@ public class ParserV2 {
     }
 
     private void AnalyseBinopMut(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (currentValue.equals("*")){
@@ -752,8 +936,12 @@ public class ParserV2 {
     }
 
     private void AnalyseBinopComp(Node parent){
-        ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
-   
+        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (validetoken1.contains(currentValue)){
@@ -765,7 +953,10 @@ public class ParserV2 {
     }
 
     private void AnalyseBinopAnd(Node parent){
-
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (currentValue.equals("and")){
@@ -778,6 +969,10 @@ public class ParserV2 {
     }
 
     private void AnalyseBinopOr(Node parent){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
 
         if (currentValue.equals("or")){
@@ -791,6 +986,10 @@ public class ParserV2 {
 
     private void AnalyseConst(Node parent){
         final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
         
         String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
         
