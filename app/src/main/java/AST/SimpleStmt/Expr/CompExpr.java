@@ -3,7 +3,7 @@ package AST.SimpleStmt.Expr;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import AST.SimpleStmt.Expr.TermExpr.Const.Bool;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
 import AST.SimpleStmt.Expr.TermExpr.Const.StringType;
 
@@ -22,7 +22,7 @@ public class CompExpr extends NotExpr {
         return symbole;
     }
 
-    public void setSymbole(CompBinop symbole) {
+    public void setCompSymbole(CompBinop symbole) {
         this.symbole = symbole;
     }
 
@@ -72,25 +72,25 @@ public class CompExpr extends NotExpr {
         if (left instanceof IntegerType && right instanceof IntegerType) {
             int leftValue = ((IntegerType) left).getValue();
             int rightValue = ((IntegerType) right).getValue();
-            return new Bool(arithmeticComp(leftValue, rightValue, symbole));
+            return new BoolType(arithmeticComp(leftValue, rightValue, symbole));
         }
 
-        if (left instanceof Bool && right instanceof Bool) {
-            int leftBool = ((Bool) left).getBool() == false ? 0 : 1;
-            int rightBool = ((Bool) right).getBool() == false ? 0 : 1;
-            return new Bool(arithmeticComp(leftBool, rightBool, symbole));
+        if (left instanceof BoolType && right instanceof BoolType) {
+            int leftBool = ((BoolType) left).getValue() == false ? 0 : 1;
+            int rightBool = ((BoolType) right).getValue() == false ? 0 : 1;
+            return new BoolType(arithmeticComp(leftBool, rightBool, symbole));
         }
 
-        if (left instanceof IntegerType && right instanceof Bool) {
+        if (left instanceof IntegerType && right instanceof BoolType) {
             int leftValue = ((IntegerType) left).getValue();
-            int rightBool = ((Bool) right).getBool() == false ? 0 : 1;
-            return new Bool(arithmeticComp(leftValue, rightBool, symbole));
+            int rightBool = ((BoolType) right).getValue() == false ? 0 : 1;
+            return new BoolType(arithmeticComp(leftValue, rightBool, symbole));
         }
 
-        if (left instanceof Bool && right instanceof IntegerType) {
-            int leftBool = ((Bool) left).getBool() == false ? 0 : 1;
+        if (left instanceof BoolType && right instanceof IntegerType) {
+            int leftBool = ((BoolType) left).getValue() == false ? 0 : 1;
             int rightValue = ((IntegerType) right).getValue();
-            return new Bool(arithmeticComp(leftBool, rightValue, symbole));
+            return new BoolType(arithmeticComp(leftBool, rightValue, symbole));
         }
 
         if (left instanceof StringType && right instanceof StringType) {
@@ -121,7 +121,7 @@ public class CompExpr extends NotExpr {
                     break;
             }
     
-            return new Bool(result);
+            return new BoolType(result);
         }
 
         return this;

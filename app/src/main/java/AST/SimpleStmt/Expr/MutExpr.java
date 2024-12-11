@@ -3,7 +3,7 @@ package AST.SimpleStmt.Expr;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import AST.SimpleStmt.Expr.TermExpr.Const.Bool;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
 
 public class MutExpr extends AddExpr {
@@ -21,7 +21,7 @@ public class MutExpr extends AddExpr {
         return symbole;
     }
 
-    public void setSymbole(MutBinop symbole) {
+    public void setMutSymbole(MutBinop symbole) {
         this.symbole = symbole;
     }
 
@@ -57,8 +57,6 @@ public class MutExpr extends AddExpr {
         }
     }
 
-    
-
     public MutExpr simplify(){
         this.left = left.simplify();
         this.right = right.simplify();
@@ -69,20 +67,20 @@ public class MutExpr extends AddExpr {
             return new IntegerType(evaluate(leftValue, rightValue, symbole));
         }
 
-        if (left instanceof Bool && right instanceof Bool) {
-            int leftBool = ((Bool) left).getBool() == false ? 0 : 1;
-            int rightBool = ((Bool) right).getBool() == false ? 0 : 1;
+        if (left instanceof BoolType && right instanceof BoolType) {
+            int leftBool = ((BoolType) left).getValue() == false ? 0 : 1;
+            int rightBool = ((BoolType) right).getValue() == false ? 0 : 1;
             return new IntegerType(evaluate(leftBool, rightBool, symbole));
         }
 
-        if (left instanceof IntegerType && right instanceof Bool) {
+        if (left instanceof IntegerType && right instanceof BoolType) {
             int leftValue = ((IntegerType) left).getValue();
-            int rightBool = ((Bool) right).getBool() == false ? 0 : 1;
+            int rightBool = ((BoolType) right).getValue() == false ? 0 : 1;
             return new IntegerType(evaluate(leftValue, rightBool, symbole));
         }
 
-        if (left instanceof Bool && right instanceof IntegerType) {
-            int leftBool = ((Bool) left).getBool() == false ? 0 : 1;
+        if (left instanceof BoolType && right instanceof IntegerType) {
+            int leftBool = ((BoolType) left).getValue() == false ? 0 : 1;
             int rightValue = ((IntegerType) right).getValue();
             return new IntegerType(evaluate(leftBool, rightValue, symbole));
         }
@@ -96,7 +94,7 @@ public class MutExpr extends AddExpr {
 
             MutExpr new_left = new MutExpr();
 
-            new_left.setSymbole(symbole);
+            new_left.setMutSymbole(symbole);
             symbole = right.getMutSymbole();
             new_left.setLeft(left);
             new_left.setRight(right.left);

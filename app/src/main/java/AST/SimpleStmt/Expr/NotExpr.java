@@ -3,6 +3,8 @@ package AST.SimpleStmt.Expr;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import AST.SimpleStmt.Expr.TermExpr.Const.*;
+
 public class NotExpr extends AndExpr {
     private NotExpr expr;
 
@@ -14,7 +16,7 @@ public class NotExpr extends AndExpr {
         return expr;
     }
 
-    public void setExpr(NotExpr expr) {
+    public void setNotExpr(NotExpr expr) {
         this.expr = expr;
     }
 
@@ -29,8 +31,14 @@ public class NotExpr extends AndExpr {
     }
 
     public NotExpr simplify(){
+        if (expr == null) return null;
         expr = expr.simplify();  
-        if (expr instanceof NotExpr) return this.expr.getNotExpr();
-        else return this;
+        if (expr == null) return null;
+
+        if (expr instanceof BoolType && ((BoolType) expr).getValue()) return new BoolType(false);
+        if (expr instanceof BoolType && !((BoolType) expr).getValue()) return new BoolType(true);
+        if (expr instanceof CompExpr) return this;
+        if (expr instanceof NotExpr) return ((NotExpr) expr).getNotExpr();
+        return this;
     }
 }

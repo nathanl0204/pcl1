@@ -3,8 +3,7 @@ package AST.SimpleStmt;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import AST.Ident;
-import AST.Node;
+import AST.SimpleStmt.Expr.TermExpr.*;
 import AST.SimpleStmt.Expr.Expr;
 
 public class Affect extends SimpleStmt {
@@ -38,13 +37,13 @@ public class Affect extends SimpleStmt {
         if (this.ident != null) {
             String identNodeName = nodeName + "_ident"; 
             writer.write("  " + nodeName + " -- " + identNodeName + ";\n");
-            ((Node) this.ident).vizualisation(writer, identNodeName);
+            this.ident.vizualisation(writer, identNodeName);
         }
 
         if (this.expr != null) {
             String exprNodeName = nodeName + "_expr"; 
             writer.write("  " + nodeName + " -- " + exprNodeName + ";\n");
-            ((Node) this.expr).vizualisation(writer, exprNodeName); 
+            this.expr.vizualisation(writer, exprNodeName); 
         }
     }
 

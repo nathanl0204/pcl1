@@ -3,22 +3,22 @@ package AST.SimpleStmt.Expr.TermExpr.Const;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-public class Bool extends Const {
+public class BoolType extends Const {
     private boolean value;
 
-    public Bool() {
+    public BoolType() {
         this.value = false;
     }
 
-    public Bool(boolean value) {
+    public BoolType(boolean value) {
         this.value = value;
     }
 
-    public boolean getBool() {
+    public boolean getValue() {
         return value;
     }
 
-    public void setBool(boolean value) {
+    public void setValue(boolean value) {
         this.value = value;
     }
 
@@ -26,7 +26,7 @@ public class Bool extends Const {
         writer.write("  " + nodeName + " [label=\""+value+"\"];\n");
     }
 
-    public Bool simplify(){
+    public BoolType simplify(){
         return this;
     }
 }  

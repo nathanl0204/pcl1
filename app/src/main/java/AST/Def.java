@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import AST.SimpleStmt.Expr.TermExpr.Ident;
 import AST.Stmt.Stmt;
+
 
 public class Def extends Node {
     private Ident ident;

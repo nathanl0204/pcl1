@@ -4,14 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import AST.*;
-import ANALYSE.*;
-import AST.SimpleStmt.Expr.AddBinop;
-import AST.SimpleStmt.Expr.AddExpr;
-import AST.SimpleStmt.Expr.MutBinop;
-import AST.SimpleStmt.Expr.MutExpr;
-import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
-
 public class Lexeur {
     public static ArrayList<String[]> token_stack = new ArrayList<>();
     public static ArrayList<Integer> indentations_stack = new ArrayList<>();
@@ -371,10 +363,10 @@ public class Lexeur {
     }
 
 
-    public static void main(String[] args){
+    public static void execute(String filePath){
 
         try{
-            FileReader fileReader = new FileReader("src/main/resources/test.py");
+            FileReader fileReader = new FileReader(filePath);
         
             BufferedReader reader = new BufferedReader(fileReader);
 
@@ -427,85 +419,5 @@ public class Lexeur {
         } catch (IOException e) {
 			e.printStackTrace();
 		}
-
-        AnalyseFile analyseFile = new AnalyseFile(token_stack);
-
-        try {
-            // Lancer l'analyse
-            analyseFile.Analyse();
-            System.out.println("Analyse terminée avec succès !");
-        } catch (AnalyseException e) {
-            // Gestion des erreurs
-            System.err.println("Erreur lors de l'analyse : " + e.getMessage());
-        }
-
-
-        // test AST
-        MutExpr mut5 = new MutExpr();
-        mut5.setRight(new IntegerType(70));
-        mut5.setLeft(new IntegerType(60));
-        mut5.setSymbole(MutBinop.DIV);
-
-        MutExpr mut4 = new MutExpr();
-        mut4.setRight(mut5);
-        mut4.setLeft(new IntegerType(50));
-        mut4.setSymbole(MutBinop.MULT);
-
-        MutExpr mut3 = new MutExpr();
-        mut3.setRight(mut4);
-        mut3.setLeft(new IntegerType(40));
-        mut3.setSymbole(MutBinop.MULT);
-
-
-
-
-        MutExpr mut2 = new MutExpr();
-        mut2.setRight(new IntegerType(40));
-        mut2.setLeft(new IntegerType(30));
-        mut2.setSymbole(MutBinop.DIV);
-        
-        MutExpr mut1 = new MutExpr();
-        mut1.setRight(mut2);
-        mut1.setLeft(new IntegerType(20));
-        mut1.setSymbole(MutBinop.MOD);
-
-        MutExpr mut = new MutExpr();
-        mut.setRight(mut1);
-        mut.setLeft(new IntegerType(10));
-        mut.setSymbole(MutBinop.MULT);
-
-
-        AddExpr expr4 = new AddExpr();
-        expr4.setRight(mut3);
-        expr4.setLeft(new IntegerType(5));
-        expr4.setSymbole(AddBinop.ADD);
-
-        AddExpr expr3 = new AddExpr();
-        expr3.setRight(expr4);
-        expr3.setLeft(new IntegerType(4));
-        expr3.setSymbole(AddBinop.SUB);
-
-        AddExpr expr2 = new AddExpr();
-        expr2.setRight(expr3);
-        expr2.setLeft(new IntegerType(3));
-        expr2.setSymbole(AddBinop.SUB);
-        
-        AddExpr expr1 = new AddExpr();
-        expr1.setRight(expr2);
-        expr1.setLeft(new IntegerType(2));
-        expr1.setSymbole(AddBinop.ADD);
-
-        AddExpr expr = new AddExpr();
-        expr.setRight(expr1);
-        expr.setLeft(mut);
-        expr.setSymbole(AddBinop.ADD);
-
-        
-        AST ast = new AST();
-        ast.root = new File();
-        expr.leftRotate();
-        ast.root.addStmts(expr);
-
-        ast.vizualisation();
     }
 }

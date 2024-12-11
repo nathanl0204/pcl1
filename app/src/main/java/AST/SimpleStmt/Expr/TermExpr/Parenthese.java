@@ -31,7 +31,9 @@ public class Parenthese extends TermExpr {
     }
 
     public Parenthese simplify(){
-        this.expr = this.expr.simplify();
+        if (expr == null) return null;
+        expr = expr.simplify();
+        if (expr == null) return null;
         return this;
     }
 }

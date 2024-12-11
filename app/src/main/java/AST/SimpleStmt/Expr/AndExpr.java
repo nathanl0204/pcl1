@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import AST.SimpleStmt.Expr.TermExpr.Const.Bool;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 
 public class AndExpr extends OrExpr {
     private List<NotExpr> exprs;
@@ -19,7 +19,7 @@ public class AndExpr extends OrExpr {
         return exprs;
     }
 
-    public void addExpr(NotExpr expr) {
+    public void addAndExpr(NotExpr expr) {
         this.exprs.add(expr);
     }
 
@@ -38,12 +38,12 @@ public class AndExpr extends OrExpr {
                      .map(elt -> elt.simplify()) 
                      .collect(Collectors.toList());  
 
-        exprs.removeIf(expr -> expr instanceof Bool && ((Bool)expr).getBool());
-        if (exprs.isEmpty()) return new Bool(true); 
+        exprs.removeIf(expr -> expr instanceof BoolType && ((BoolType)expr).getValue());
+        if (exprs.isEmpty()) return new BoolType(true); 
 
         for (Expr expr : exprs) {
-            if (expr instanceof Bool && ((Bool)expr).getBool() ){
-                return new Bool(false); 
+            if (expr instanceof BoolType && !((BoolType)expr).getValue() ){
+                return new BoolType(false); 
             }
         }
 

@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 class NoneType extends Const {
+
+    public NoneType() {};
+
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"NONE\"];\n");
     }
