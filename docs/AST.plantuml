@@ -104,6 +104,14 @@
 
     interface Expr extends SimpleStmt 
 
+    class ExprTab implements Expr{
+        - Expr expr
+        - List<AndExpr> exprs
+        + ExprTab(Expr expr, List<Expr> exprs)
+        + ExprTab(List<Expr> exprs)
+        + void setLeft(Expr expr)
+    }
+
     class OrExpr implements Expr{
         - List<AndExpr> exprs
         + OrExpr()
