@@ -17,6 +17,10 @@ public class Tree {
         return this.childs;
     }
 
+    public void addChild(Tree child) {
+        this.childs.add(child);
+    }
+
     public void show(boolean is_first) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter("src/main/resources/tree.puml"))) {
             if (is_first) {

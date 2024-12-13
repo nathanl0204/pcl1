@@ -1,0 +1,8 @@
+@startuml
+[*] --> file
+file --> file
+@enduml
+etoile
+file --> opt_newline
+file --> stmt_plus
+
