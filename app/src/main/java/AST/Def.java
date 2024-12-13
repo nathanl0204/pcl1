@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import AST.SimpleStmt.Expr.TermExpr.Ident;
-import AST.Stmt.Stmt;
-
 
 public class Def extends Node {
     private Ident ident;
     private List<Ident> idents;
-    private Stmt suite;
+    private Suite suite;
 
     public Def() {
         this.idents = new ArrayList<>();
@@ -23,23 +21,23 @@ public class Def extends Node {
         return ident;
     }
 
-    public void setIdent(Ident new_ident) {
-        this.ident = new_ident;
+    public void setIdent(Ident ident) {
+        this.ident = ident;
     }
 
     public List<Ident> getIdents() {
         return idents;
     }
 
-    public void addIdent(Ident new_ident) {
-        this.idents.add(new_ident);
+    public void setIdents(List<Ident> idents) {
+        this.idents = idents;
     }
 
-    public Stmt getSuite() {
+    public Suite getSuite() {
         return suite;
     }
 
-    public void setSuite(Stmt suite) {
+    public void setSuite(Suite suite) {
         this.suite = suite;
     }
 

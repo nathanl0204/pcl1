@@ -1,80 +1,93 @@
-import java.util.ArrayList;
 
 public class Token {
     
     private String type;
-    private String type_specifique;
+    private String value;
     private String line;
 
 
-    public String getValue(String[] token) {
-        if (token[0].equals("$")) {
+    public Token(String type, String value, String line){
+        this.type = type;
+        this.value = value;
+        this.line = line;
+    }
+
+    public String getLine(){
+        return line;
+    }
+
+    public String getValue(){
+        return value;
+    }
+
+    public String getSymbole() {
+        if (type.equals("$")) {
             return "$";
         }
-        if (token[0].equals("id")) {
+        if (type.equals("id")) {
             return "ident";
         }
-        else if (token[0].equals("keyword")) {
-            return token[1];
+        else if (type.equals("keyword")) {
+            return value;
         }
-        else if (token[0].equals("number")) {
+        else if (type.equals("number")) {
             return "integer";
         }
-        else if (token[0].equals("string")) {
+        else if (type.equals("string")) {
             return "string";
         }
-        else if (token[0].equals("op")) {
-            if (token[1].equals("LP")) {
+        else if (type.equals("op")) {
+            if (value.equals("LP")) {
                 return "(";
             }
-            else if (token[1].equals("RP")) {
+            else if (value.equals("RP")) {
                 return ")";
             }
-            else if (token[1].equals("LB")) {
+            else if (value.equals("LB")) {
                 return "[";
             }
-            else if (token[1].equals("RB")) {
+            else if (value.equals("RB")) {
                 return "]";
             }
-            else if (token[1].equals("MOD")) {
+            else if (value.equals("MOD")) {
                 return "%";
             }
-            else if (token[1].equals("DD")) {
+            else if (value.equals("DD")) {
                 return ":";
             }
-            else if (token[1].equals("EQ")) {
+            else if (value.equals("EQ")) {
                 return "=";
             }
-            else if (token[1].equals("DIV")) {
+            else if (value.equals("DIV")) {
                 return "//";
             }
-            else if (token[1].equals("SUB")) {
+            else if (value.equals("SUB")) {
                 return "-";
             }
-            else if (token[1].equals("ADD")) {
+            else if (value.equals("ADD")) {
                 return "+";
             }
-            else if (token[1].equals("MULT")) {
+            else if (value.equals("MULT")) {
                 return "*";
             }
             else {
                 return ",";
             }
         }
-        else if (token[0].equals("relop")) {
-            if (token[1].equals("LE")) {
+        else if (type.equals("relop")) {
+            if (value.equals("LE")) {
                 return "<=";
             }
-            else if (token[1].equals("GE")) {
+            else if (value.equals("GE")) {
                 return ">=";
             }
-            else if (token[1].equals("LT")) {
+            else if (value.equals("LT")) {
                 return "<";
             }
-            else if (token[1].equals("GT")) {
+            else if (value.equals("GT")) {
                 return ">";
             }
-            else if (token[1].equals("EQ")) {
+            else if (value.equals("EQ")) {
                 return "==";
             }
             else {
@@ -82,10 +95,7 @@ public class Token {
             }
         }
         else { // case of ws
-            return token[1];
+            return value;
         }
-    }
-        public String[] getCurrentToken(ArrayList<String[]> token_stack) {
-        return token_stack.get(0);
     }
 }

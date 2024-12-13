@@ -15,6 +15,11 @@ public class Affect extends SimpleStmt {
         this.expr = null; 
     }
 
+    public Affect(Ident ident, Expr expr) {
+        this.ident = ident;
+        this.expr = expr;
+    }
+
     public Ident getIdent() {
         return ident;
     }

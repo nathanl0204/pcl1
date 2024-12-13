@@ -15,6 +15,10 @@ public class Suite extends Node {
         this.stmts = new ArrayList<>();
     }
 
+    public Suite(List<Stmt> stmts) {
+        this.stmts = stmts;
+    }
+
     public List<Stmt> getStmts() {
         return stmts;
     }

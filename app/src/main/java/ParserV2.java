@@ -1,998 +1,1063 @@
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Arrays;
 import java.util.Queue;
 
 import ANALYSE.AnalyseException;
 import ANALYSE.ConvertToken;
-
+import AST.Def;
+import AST.File;
 import AST.Node;
+import AST.Suite;
+import AST.SimpleStmt.Affect;
+import AST.SimpleStmt.SimpleStmt;
+import AST.SimpleStmt.Expr.Expr;
+import AST.SimpleStmt.Expr.TermExpr.Ident;
+import AST.SimpleStmt.Expr.TermExpr.Const.Const;
+import AST.Stmt.Stmt;
 
 public class ParserV2 {
-    private Queue<String[]> tokenQueue = new LinkedList<String[]>();
-    private ConvertToken convertToken = new ConvertToken();
+    private Queue<Token> tokenQueue = new LinkedList<Token>();
 
-    public ParserV2(Queue<String[]> tokenQueue){
+    public ParserV2(Queue<Token> tokenQueue){
         this.tokenQueue = tokenQueue;
     }
 
-    public void startAnalyse(Node parent){
-        AnalyseFile(parent);
+    public void startAnalyse(){
+        AnalyseFile();
     }
     
-    private void AnalyseFile(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+    private File AnalyseFile(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+
+        Token currentToken = tokenQueue.peek();
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-        
-        if (validetoken.contains(currentValue)){
+        if (validetoken.contains(currentToken.getSymbole())){
+            
 
             AnalyseOptNewline();
-            AnalyseDefEtoile(parent);
-            AnalyseStmtPlus(parent);
+            
+            File file = new File( AnalyseDefEtoile() , AnalyseStmtPlus() );
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("EOF")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("EOF")){
                 System.out.println("MOT RECONNUE | AUCUN PROBLEME");
-                return;
+                return file;
             }
+
+            
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
+        return null;
     }
 
     private void AnalyseOptNewline(){
+        LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("def", "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
 
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-        if (currentValue.equals("NEWLINE")){
+        Token currentToken = tokenQueue.peek();
+        if (currentToken.getSymbole().equals("NEWLINE")){
             tokenQueue.poll();
         }
+        else if (validetoken.contains(currentToken.getSymbole())){
+
+        }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseDefEtoile(Node parent){
+    private Def AnalyseDeft(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.poll();
 
-        if (currentValue.equals("def")){
-            AnalyseDeft(parent);
-            AnalyseDefEtoile(parent);
-        }
-        else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-        
-    }
+        if (currentToken.getSymbole().equals("def")){
+            Def def = new Def();
 
-    private void AnalyseStmtPlus(Node parent){
-        ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("ident")){
+                Ident ident = new Ident(currentToken.getValue()); // A revoir 
 
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-
-        if (validetoken.contains(currentValue)){
-            AnalyseStmt(parent);
-            AnalyseStmtPlusRest(parent);
-        }
-        else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-    }
-
-    private void AnalyseStmtPlusRest(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList( "EOF","END")) ;
-
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-        
-        if (validetoken.contains(currentValue)){
-            AnalyseStmtPlus(parent);
-        }
-        else if (validetoken1.contains(currentValue)){
-            return;
-        }   
-        else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-    }
-
-    private void AnalyseDeft(Node parent){
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-
-        if (currentValue.equals("def")){
-           currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("ident")){
-                currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                if(currentValue.equals("(")){
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("(")){
 
 
-                    AnalyseIdentEtoileVirgule(parent);
+                    LinkedList<Ident> idents = AnalyseIdentEtoileVirgule();
 
-                    currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                    if(currentValue.equals(")")){
+                    currentToken = tokenQueue.poll();
+                    if(currentToken.getSymbole().equals(")")){
                         
-                        currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                        if(currentValue.equals(":")){
-                            AnalyseSuite(parent);
+                        currentToken = tokenQueue.poll();
+                        if(currentToken.getSymbole().equals(":")){
+                            def.setIdent(ident);
+                            def.setIdents(idents);
+                            def.setSuite( AnalyseSuite() );
+
+                            return def;
                         }
                         else{
-                            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                         }
 
                     }
                     else{
-                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                     }
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
             
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseIdentEtoileVirgule(Node parent){
+    private LinkedList<Def> AnalyseDefEtoile(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("ident")){
-            AnalyseIdentPlusVirgule(parent);
-        }
-        else if (currentValue.equals(")")){
-            return;
-        }
-        else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
+        if (currentToken.getSymbole().equals("def")){
+            Def def = AnalyseDeft();
+            LinkedList<Def> defs = AnalyseDefEtoile();
 
-    }
-
-    private void AnalyseIdentPlusVirgule(Node parent){
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-
-        if (currentValue.equals("ident")){
-            tokenQueue.poll();
-            AnalyseIdentPlusVirguleRest(parent);
-        }
-        else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-    }
-
-    private void AnalyseIdentPlusVirguleRest(Node parent){
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-
-        if (currentValue.equals(")")){
-            return;
-        }
-        else if (currentValue.equals(",")){
-            tokenQueue.poll();
-            AnalyseIdentPlusVirguleRest(parent);
-        }
-        else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-    }
-
-    private void AnalyseSuite(Node parent){
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
-
-        if (currentValue.equals("NEWLINE")){
-            tokenQueue.poll();
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("BEGIN")){
-
-
-                AnalyseStmtPlus(parent); 
-
-
-                currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                if(currentValue.equals("END")){
-                    return;
-                }
-                else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-                }
-
-            }
-            else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-            }
-        }
-
-        else if (validetoken.contains(currentValue)){
-
-
-            AnalyseSimpleStmt(parent);
-
-
-            currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-            if(currentValue.equals("NEWLINE")){
-                return;
-            }
-            else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-            }
-        }
-        else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
-        }
-
-    }
-
-    private void AnalyseSimpleStmt(Node parent){
-        if (tokenQueue.isEmpty()) {
-            throw new AnalyseException("Erreur : pile de tokens vide !");
-        }
-        
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
-
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
-
-        if (currentValue.equals("ident")){
-            tokenQueue.poll();
-
-
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if (currentValue.equals("=")){
-                AnalyseExpr(parent);
+            if (defs == null) {
+                LinkedList<Def> newDefs = new LinkedList<Def>();
+                newDefs.add(def);
+                
+                return newDefs;
             }
             else {
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                defs.add(def);
+                return defs;
+            }
+
+
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+        
+    }
+
+    private LinkedList<Stmt> AnalyseStmtPlus(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            Stmt stmt = AnalyseStmt();
+            LinkedList<Stmt> stmts = AnalyseStmtPlusRest();
+
+            if (stmts == null){
+                LinkedList<Stmt> newStmts = new LinkedList<Stmt>();
+                newStmts.add(stmt);
+                return newStmts;
+            }
+            else {
+                stmts.add(stmt);
+                return stmts;
             }
         }
-        else if(validetoken.contains(currentValue)){
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+    }
 
-            AnalyseOrExpr(parent);
-            AnalyseSimpleStmtFact(parent);
+    private LinkedList<Stmt> AnalyseStmtPlusRest(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList( "EOF","END")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken.contains(currentToken.getSymbole())){
+            return AnalyseStmtPlus();
+        }
+        else if (validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }   
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+    }
+
+    private LinkedList<Ident> AnalyseIdentEtoileVirgule(){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            return AnalyseIdentPlusVirgule();
+        }
+        else if (currentToken.getSymbole().equals(")")){
+            return null;
+        }
+        else {
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+
+    }
+
+    private LinkedList<Ident> AnalyseIdentPlusVirgule(){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            tokenQueue.poll();
+            Ident ident = new Ident();
+            LinkedList<Ident> idents = AnalyseIdentPlusVirguleRest();
+
+            if (idents == null){
+                LinkedList<Ident> newIdents = new LinkedList<>();
+                newIdents.add(ident);
+                return newIdents;
+            }
+            else {
+                idents.add(ident);
+                return idents;
+            }
+        }
+        else {
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+    }
+
+    private LinkedList<Ident> AnalyseIdentPlusVirguleRest(){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals(")")){
+            return null;
+        }
+        else if (currentToken.getSymbole().equals(",")){
+            tokenQueue.poll();
+            return AnalyseIdentPlusVirgule();
+        }
+        else {
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+    }
+
+    private Suite AnalyseSuite(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (currentToken.getSymbole().equals("NEWLINE")){
+            tokenQueue.poll();
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("BEGIN")){
+
+                Suite suite = new Suite( AnalyseStmtPlus() ); 
+
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("END")){
+                    return suite;
+                }
+                else{
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                }
+
+            }
+            else{
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            }
+        }
+
+        else if (validetoken.contains(currentToken.getSymbole())){
+
+
+            SimpleStmt simpleStmt = AnalyseSimpleStmt();
+
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("NEWLINE")){
+                return new Suite( Arrays.asList(simpleStmt) );
+            }
+            else{
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            }
+        }
+        else{
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+        }
+
+    }
+
+    private SimpleStmt AnalyseSimpleStmt(){
+        if (tokenQueue.isEmpty()) {
+            throw new AnalyseException("Erreur : pile de tokens vide !");
+        }
+        
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            tokenQueue.poll();
+            
+            Ident ident = new Ident(currentToken.getValue());
+
+            currentToken = tokenQueue.poll();
+            if (currentToken.getSymbole().equals("=")){
+                return new Affect( ident , AnalyseExpr() );
+            }
+            else {
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            }
+        }
+        else if(validetoken.contains(currentToken.getSymbole())){
+
+            AnalyseOrExpr();
+            AnalyseSimpleStmtFact();
             
         }
-        else if(currentValue.equals("return")){
+        else if(currentToken.getSymbole().equals("return")){
             
             tokenQueue.poll();
-            AnalyseExpr(parent);
+            AnalyseExpr();
 
         }
-        else if(currentValue.equals("print")){
+        else if(currentToken.getSymbole().equals("print")){
             tokenQueue.poll();
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+            currentToken = tokenQueue.poll();
 
-            if(currentValue.equals("(")){
+            if(currentToken.getSymbole().equals("(")){
                 
-                AnalyseExpr(parent);
+                AnalyseExpr();
 
-
-                currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                if(currentValue.equals(")")){
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals(")")){
                     return;
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
             
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
 
     }
 
-    private void AnalyseSimpleStmtFact(Node parent){
+    private void AnalyseSimpleStmtFact(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "NEWLINE","=")) ;
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "NEWLINE","=")) ;
 
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if(validetoken.contains(currentValue)){
-            AnalyseSimpleStmtFactFact(parent);
+        if(validetoken.contains(currentToken.getSymbole())){
+            AnalyseSimpleStmtFactFact();
         }
-        else if(currentValue.equals("[")){
+        else if(currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
 
 
-            AnalyseExpr(parent);
+            AnalyseExpr();
 
 
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("]")){
-                AnalyseExprCrochetEtoile(parent);
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+                AnalyseExprCrochetEtoile();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
             
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseSimpleStmtFactFact(Node parent){
+    private void AnalyseSimpleStmtFactFact(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("=")){
+        if (currentToken.getSymbole().equals("=")){
             tokenQueue.poll();
 
-            AnalyseExpr(parent);
+            AnalyseExpr();
         }
-        else if (currentValue.equals("NEWLINE")){
+        else if (currentToken.getSymbole().equals("NEWLINE")){
             return ;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseStmt(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
+    private Stmt AnalyseStmt(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
     
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-
-
-
-            AnalyseSimpleStmt(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
 
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("NEWLINE")){
+
+            AnalyseSimpleStmt();
+
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("NEWLINE")){
                 return;
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
             
         }
-        else if (currentValue.equals("for")){
+        else if (currentToken.getSymbole().equals("for")){
             tokenQueue.poll();
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("ident")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("ident")){
 
-                currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                if(currentValue.equals("in")){
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("in")){
                     
-                    AnalyseExpr(parent);
+                    AnalyseExpr();
 
-                    currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-                    if(currentValue.equals(":")){
+                    currentToken = tokenQueue.poll();
+                    if(currentToken.getSymbole().equals(":")){
                         
-                        AnalyseSuite(parent);
+                        AnalyseSuite();
                     }
                     else{
-                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                     }
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
                 }
                 
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
-        else if (currentValue.equals("if")){
+        else if (currentToken.getSymbole().equals("if")){
             tokenQueue.poll();
 
-            AnalyseExpr(parent);
+            AnalyseExpr();
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals(":")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(":")){
                 
-                AnalyseSuite(parent);
-                AnalyseStmtElse(parent);
+                AnalyseSuite();
+                AnalyseStmtElse();
                 
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
 
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseStmtElse(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseStmtElse(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("else")){
+        if (currentToken.getSymbole().equals("else")){
             tokenQueue.poll();
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+            currentToken = tokenQueue.poll();
 
-            if (currentValue.equals(":")){
+            if (currentToken.getSymbole().equals(":")){
                 
-                AnalyseSuite(parent);
+                AnalyseSuite();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne t: " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne t: " + currentToken.getLine());
             }
 
         }
-        else if (validetoken.contains(currentValue)){
+        else if (validetoken.contains(currentToken.getSymbole())){
             return ;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
+    private Expr AnalyseExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseOrExpr(parent);
-            AnalyseExprCrochetEtoile(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseOrExpr();
+            AnalyseExprCrochetEtoile();
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprCrochetEtoile(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
+    private void AnalyseExprCrochetEtoile(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("[")){
+        if (currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
-            AnalyseExpr(parent);
+            AnalyseExpr();
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("]")){
-                AnalyseExprCrochetEtoile(parent);
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+                AnalyseExprCrochetEtoile();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
-        else if (validetoken.contains(currentValue)){
+        else if (validetoken.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseOrExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseOrExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseAndExpr(parent);
-            AnalyseOrExprRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseAndExpr();
+            AnalyseOrExprRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseOrExprRest(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
+    private void AnalyseOrExprRest(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("or")){
-            AnalyseBinopOr(parent);
-            AnalyseOrExpr(parent);
+        if (currentToken.getSymbole().equals("or")){
+            AnalyseBinopOr();
+            AnalyseOrExpr();
         }
-        else if(validetoken.contains(currentValue)){
+        else if(validetoken.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAndExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseAndExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseNotExpr(parent);
-            AnalyseAndExprRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseNotExpr();
+            AnalyseAndExprRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAndExprRest(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
+    private void AnalyseAndExprRest(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("and")){
-            AnalyseBinopAnd(parent);
-            AnalyseAndExpr(parent);
+        if (currentToken.getSymbole().equals("and")){
+            AnalyseBinopAnd();
+            AnalyseAndExpr();
         }
-        else if(validetoken.contains(currentValue)){
+        else if(validetoken.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseNotExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseNotExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseCompExpr(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseCompExpr();
         }
-        else if(currentValue.equals("not")){
+        else if(currentToken.getSymbole().equals("not")){
             tokenQueue.poll();
-            AnalyseCompExpr(parent);
+            AnalyseCompExpr();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseCompExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseCompExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseAddExpr(parent);
-            AnalyseCompExprRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseAddExpr();
+            AnalyseCompExprRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseCompExprRest(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]")) ;
-        final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+    private void AnalyseCompExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken2.contains(currentValue)){
-            AnalyseBinopComp(parent);
-            AnalyseAddExpr(parent);
+        if (validetoken2.contains(currentToken.getSymbole())){
+            AnalyseBinopComp();
+            AnalyseAddExpr();
         }
-        else if(validetoken1.contains(currentValue)){
+        else if(validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAddExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseAddExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
         
-        if (validetoken.contains(currentValue)){
-            AnalyseMutExpr(parent);
-            AnalyseAddExprRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseMutExpr();
+            AnalyseAddExprRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
 
     }
 
-    private void AnalyseAddExprRest(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==")) ;
-        final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("-","+")) ;
+    private void AnalyseAddExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("-","+")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
         
-        if (validetoken2.contains(currentValue)){
-            AnalyseBinopAdd(parent);
-            AnalyseAddExpr(parent);
+        if (validetoken2.contains(currentToken.getSymbole())){
+            AnalyseBinopAdd();
+            AnalyseAddExpr();
         }
-        else if(validetoken1.contains(currentValue)){
+        else if(validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseMutExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseMutExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
         
-        if (validetoken.contains(currentValue)){
-            AnalyseTerminalExpr(parent);
-            AnalyseMutExprRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseTerminalExpr();
+            AnalyseMutExprRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseMutExprRest(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-")) ;
-        final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList("*","//","%")) ;
+    private void AnalyseMutExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("*","//","%")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken2.contains(currentValue)){
-            AnalyseBinopMut(parent);
-            AnalyseMutExpr(parent);
+        if (validetoken2.contains(currentToken.getSymbole())){
+            AnalyseBinopMut();
+            AnalyseMutExpr();
         }
-        else if(validetoken1.contains(currentValue)){
+        else if(validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseTerminalExpr(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+    private void AnalyseTerminalExpr(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("ident")){
+        if (currentToken.getSymbole().equals("ident")){
             tokenQueue.poll();
-            AnalyseExprRestIdent(parent);
+            AnalyseExprRestIdent();
         }
-        else if(currentValue.equals("(")){
+        else if(currentToken.getSymbole().equals("(")){
             tokenQueue.poll();
 
-            AnalyseExpr(parent);
+            AnalyseExpr();
 
             
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals(")")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(")")){
                 tokenQueue.poll();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
-        else if(currentValue.equals("[")){
+        else if(currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
-            AnalyseExprEtoileVirgule(parent);
+            AnalyseExprEtoileVirgule();
 
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals("]")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
                 tokenQueue.poll();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
-        else if(validetoken.contains(currentValue)){
-            AnalyseConst(parent);
+        else if(validetoken.contains(currentToken.getSymbole())){
+            AnalyseConst();
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " +  currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " +  currentToken.getSymbole());
         }
     }
 
-    private void AnalyseExprRestIdent(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-","*","//","%")) ;
+    private void AnalyseExprRestIdent(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-","*","//","%")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("(")){
+        if (currentToken.getSymbole().equals("(")){
             tokenQueue.poll();
-            AnalyseExprEtoileVirgule(parent);
+            AnalyseExprEtoileVirgule();
 
 
-            currentValue = convertToken.getConvertedValue(tokenQueue.poll());
-            if(currentValue.equals(")")){
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(")")){
                 return;
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
-        else if(validetoken1.contains(currentValue)){
+        else if(validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprEtoileVirgule(Node parent){
+    private void AnalyseExprEtoileVirgule(){
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals("ident")){
-            AnalyseIdentPlusVirgule(parent);
+        if (currentToken.getSymbole().equals("ident")){
+            AnalyseIdentPlusVirgule();
         }
-        else if (currentValue.equals(")")){
+        else if (currentToken.getSymbole().equals(")")){
             return;
         } 
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprPlusVirgule(Node parent){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
+    private void AnalyseExprPlusVirgule(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (validetoken.contains(currentValue)){
-            AnalyseExpr(parent);
-            AnalyseExprPlusVirguleRest(parent);
+        if (validetoken.contains(currentToken.getSymbole())){
+            AnalyseExpr();
+            AnalyseExprPlusVirguleRest();
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprPlusVirguleRest(Node parent){
+    private void AnalyseExprPlusVirguleRest(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
 
-        String currentValue = convertToken.getConvertedValue(tokenQueue.peek());
+        Token currentToken = tokenQueue.peek();
 
-        if (currentValue.equals(",")){
+        if (currentToken.getSymbole().equals(",")){
             tokenQueue.poll();
-            AnalyseExprPlusVirgule(parent);
+            AnalyseExprPlusVirgule();
         }
-        else if(currentValue.equals(")")){
+        else if(currentToken.getSymbole().equals(")")){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopAdd(Node parent){
+    private void AnalyseBinopAdd(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if (currentValue.equals("+")){
+        if (currentToken.getSymbole().equals("+")){
             return;
         }
-        else if (currentValue.equals("-")){
+        else if (currentToken.getSymbole().equals("-")){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopMut(Node parent){
+    private void AnalyseBinopMut(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if (currentValue.equals("*")){
+        if (currentToken.getSymbole().equals("*")){
             return;
         }
-        else if (currentValue.equals("//")){
+        else if (currentToken.getSymbole().equals("//")){
             return;
         }
-        else if (currentValue.equals("%")){
+        else if (currentToken.getSymbole().equals("%")){
              return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopComp(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+    private void AnalyseBinopComp(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if (validetoken1.contains(currentValue)){
+        if (validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopAnd(Node parent){
+    private void AnalyseBinopAnd(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if (currentValue.equals("and")){
+        if (currentToken.getSymbole().equals("and")){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
 
     }
 
-    private void AnalyseBinopOr(Node parent){
+    private void AnalyseBinopOr(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
 
-        if (currentValue.equals("or")){
+        if (currentToken.getSymbole().equals("or")){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
 
     }
 
-    private void AnalyseConst(Node parent){
-        final ArrayList<String> validetoken1 = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+    private Const AnalyseConst(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        String currentValue = convertToken.getConvertedValue(tokenQueue.poll());
+        Token currentToken = tokenQueue.poll();
         
     
-        if (validetoken1.contains(currentValue)){
+        if (validetoken1.contains(currentToken.getSymbole())){
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentValue);
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
 
     }

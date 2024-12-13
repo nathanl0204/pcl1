@@ -2,7 +2,6 @@ package AST;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,9 +11,9 @@ public class File extends Node{
     private List<Def> defs;
     private List<Stmt> stmts;
 
-    public File(){
-        this.defs = new ArrayList<Def>();
-        this.stmts = new ArrayList<Stmt>();
+    public File(List<Def> defs,List<Stmt> stmts){
+        this.defs = defs;
+        this.stmts = stmts;
     }
 
     public List<Def> getDefs(){
