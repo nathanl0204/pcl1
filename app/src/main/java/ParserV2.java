@@ -610,10 +610,8 @@ public class ParserV2 {
                 return orExpr;
             }
             else {
-                return null; // PB -> NOUVELLE CLASSE POUR L'AST ?????????????????
+                return new ExprTab(orExpr, exprs);
             }
-
-
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
