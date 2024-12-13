@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import AST.SimpleStmt.Expr.TermExpr.Ident;
 
-public class Def extends Node {
+public class Def implements Node {
     private Ident ident;
     private List<Ident> idents;
     private Suite suite;

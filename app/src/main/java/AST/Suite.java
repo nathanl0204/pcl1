@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import AST.Stmt.Stmt;
 
-public class Suite extends Node {
+public class Suite implements Node {
     private List<Stmt> stmts;
 
     public Suite() {

@@ -18,6 +18,12 @@ public class AddExpr extends CompExpr {
         this.right = null;
     }
 
+    public AddExpr(AddBinop binop, AddExpr right) {
+        this.symbole = binop;
+        this.left = null;
+        this.right = right;
+    }
+
     public AddBinop getAddSymbole() {
         return symbole;
     }

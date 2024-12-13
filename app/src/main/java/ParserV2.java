@@ -1,20 +1,40 @@
 
 import java.util.LinkedList;
+import java.util.List;
+import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Queue;
 
 import ANALYSE.AnalyseException;
 import ANALYSE.ConvertToken;
-import AST.Def;
-import AST.File;
-import AST.Node;
-import AST.Suite;
+import AST.*;
 import AST.SimpleStmt.Affect;
+import AST.SimpleStmt.Print;
+import AST.SimpleStmt.Return;
 import AST.SimpleStmt.SimpleStmt;
+import AST.SimpleStmt.Expr.AddBinop;
+import AST.SimpleStmt.Expr.AddExpr;
+import AST.SimpleStmt.Expr.AndExpr;
+import AST.SimpleStmt.Expr.CompBinop;
+import AST.SimpleStmt.Expr.CompExpr;
 import AST.SimpleStmt.Expr.Expr;
+import AST.SimpleStmt.Expr.MutBinop;
+import AST.SimpleStmt.Expr.MutExpr;
+import AST.SimpleStmt.Expr.NotExpr;
+import AST.SimpleStmt.Expr.OrExpr;
 import AST.SimpleStmt.Expr.TermExpr.Ident;
+import AST.SimpleStmt.Expr.TermExpr.IdentP;
+import AST.SimpleStmt.Expr.TermExpr.ListType;
+import AST.SimpleStmt.Expr.TermExpr.Parenthese;
+import AST.SimpleStmt.Expr.TermExpr.TermExpr;
+import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 import AST.SimpleStmt.Expr.TermExpr.Const.Const;
+import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
+import AST.SimpleStmt.Expr.TermExpr.Const.StringType;
+import AST.Stmt.For;
+import AST.Stmt.If;
+import AST.Stmt.IfElse;
 import AST.Stmt.Stmt;
 
 public class ParserV2 {
@@ -355,15 +375,15 @@ public class ParserV2 {
         }
         else if(validetoken.contains(currentToken.getSymbole())){
 
-            AnalyseOrExpr();
+            Expr expr = AnalyseOrExpr();
             AnalyseSimpleStmtFact();
             
         }
         else if(currentToken.getSymbole().equals("return")){
             
             tokenQueue.poll();
-            AnalyseExpr();
-
+            return new Return(AnalyseExpr());
+            
         }
         else if(currentToken.getSymbole().equals("print")){
             tokenQueue.poll();
@@ -371,11 +391,11 @@ public class ParserV2 {
 
             if(currentToken.getSymbole().equals("(")){
                 
-                AnalyseExpr();
+                Print print = new Print(AnalyseExpr());
 
                 currentToken = tokenQueue.poll();
                 if(currentToken.getSymbole().equals(")")){
-                    return;
+                    return print;
                 }
                 else{
                     throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -457,14 +477,12 @@ public class ParserV2 {
 
         if (validetoken.contains(currentToken.getSymbole())){
 
-
-
-            AnalyseSimpleStmt();
+            SimpleStmt simpleStmt = AnalyseSimpleStmt();
 
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("NEWLINE")){
-                return;
+                return simpleStmt;
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -477,15 +495,17 @@ public class ParserV2 {
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("ident")){
 
+                Ident ident = new Ident(currentToken.getValue());
                 currentToken = tokenQueue.poll();
                 if(currentToken.getSymbole().equals("in")){
                     
-                    AnalyseExpr();
+                    Expr expr = AnalyseExpr();
 
                     currentToken = tokenQueue.poll();
                     if(currentToken.getSymbole().equals(":")){
                         
-                        AnalyseSuite();
+                        return new For( ident,expr, AnalyseSuite());
+
                     }
                     else{
                         throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -503,13 +523,18 @@ public class ParserV2 {
         else if (currentToken.getSymbole().equals("if")){
             tokenQueue.poll();
 
-            AnalyseExpr();
+            Expr expr = AnalyseExpr();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals(":")){
                 
-                AnalyseSuite();
-                AnalyseStmtElse();
+                Suite suite = AnalyseSuite();
+                Suite elseSuite = AnalyseStmtElse();
+
+                if (elseSuite == null){
+                    return new If(expr,suite);
+                }
+                else return new IfElse(expr,suite,elseSuite);
                 
             }
             else{
@@ -522,7 +547,7 @@ public class ParserV2 {
         }
     }
 
-    private void AnalyseStmtElse(){
+    private Suite AnalyseStmtElse(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -538,7 +563,7 @@ public class ParserV2 {
 
             if (currentToken.getSymbole().equals(":")){
                 
-                AnalyseSuite();
+                return AnalyseSuite();
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne t: " + currentToken.getLine());
@@ -546,7 +571,7 @@ public class ParserV2 {
 
         }
         else if (validetoken.contains(currentToken.getSymbole())){
-            return ;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -563,8 +588,16 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseOrExpr();
-            AnalyseExprCrochetEtoile();
+            OrExpr orExpr = AnalyseOrExpr();
+            LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+
+            if (exprs == null){
+                return orExpr;
+            }
+            else {
+                return null; // PB -> NOUVELLE CLASSE POUR L'AST ?????????????????
+            }
+
 
         }
         else{
@@ -572,7 +605,7 @@ public class ParserV2 {
         }
     }
 
-    private void AnalyseExprCrochetEtoile(){
+    private LinkedList<Expr> AnalyseExprCrochetEtoile(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
         
         if (tokenQueue.isEmpty()) {
@@ -583,25 +616,34 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
-            AnalyseExpr();
+            Expr expr = AnalyseExpr();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
-                AnalyseExprCrochetEtoile();
+                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+                if (exprs == null) {
+                    LinkedList<Expr> newExprs = new LinkedList<>();
+                    newExprs.addFirst(expr);
+                    return newExprs;
+                }
+                else {
+                    exprs.addFirst(expr);
+                    return exprs;
+                }
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
         else if (validetoken.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseOrExpr(){
+    private OrExpr AnalyseOrExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
@@ -611,15 +653,23 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseAndExpr();
-            AnalyseOrExprRest();
+            AndExpr andExpr = AnalyseAndExpr();
+            OrExpr orExpr = AnalyseOrExprRest();
+
+            if (orExpr == null){
+                return andExpr;
+            }
+            else {
+                orExpr.addOrExpr(andExpr);
+                return orExpr;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseOrExprRest(){
+    private OrExpr AnalyseOrExprRest(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -630,17 +680,17 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("or")){
             AnalyseBinopOr();
-            AnalyseOrExpr();
+            return AnalyseOrExpr();
         }
         else if(validetoken.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAndExpr(){
+    private AndExpr AnalyseAndExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -650,15 +700,23 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseNotExpr();
-            AnalyseAndExprRest();
+            NotExpr notExpr = AnalyseNotExpr();
+            AndExpr andExpr = AnalyseAndExprRest();
+
+            if (andExpr == null){
+                return notExpr;
+            }
+            else {
+                andExpr.addOrExpr(notExpr);
+                return andExpr;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAndExprRest(){
+    private AndExpr AnalyseAndExprRest(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -669,17 +727,17 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("and")){
             AnalyseBinopAnd();
-            AnalyseAndExpr();
+            return AnalyseAndExpr();
         }
         else if(validetoken.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseNotExpr(){
+    private NotExpr AnalyseNotExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -689,18 +747,18 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseCompExpr();
+            return AnalyseCompExpr();
         }
         else if(currentToken.getSymbole().equals("not")){
             tokenQueue.poll();
-            AnalyseCompExpr();
+            return new NotExpr(AnalyseNotExpr());
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseCompExpr(){
+    private CompExpr AnalyseCompExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -710,15 +768,23 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseAddExpr();
-            AnalyseCompExprRest();
+            AddExpr addExpr = AnalyseAddExpr();
+            CompExpr compExpr = AnalyseCompExprRest();
+
+            if (compExpr == null){
+                return addExpr;
+            }
+            else {
+                compExpr.setLeft(addExpr);
+                return compExpr;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseCompExprRest(){
+    private CompExpr AnalyseCompExprRest(){
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]")) ;
         final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
 
@@ -729,18 +795,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken2.contains(currentToken.getSymbole())){
-            AnalyseBinopComp();
-            AnalyseAddExpr();
+            return new CompExpr( AnalyseBinopComp() , AnalyseAddExpr());
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseAddExpr(){
+    private AddExpr AnalyseAddExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
@@ -750,8 +815,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
         
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseMutExpr();
-            AnalyseAddExprRest();
+            MutExpr mutExpr = AnalyseMutExpr();
+            AddExpr addExpr = AnalyseAddExprRest();
+
+            if (addExpr == null){
+                return mutExpr;
+            }
+            else {
+                addExpr.setLeft(mutExpr);
+                return addExpr;
+            }
+
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -759,7 +833,7 @@ public class ParserV2 {
 
     }
 
-    private void AnalyseAddExprRest(){
+    private AddExpr AnalyseAddExprRest(){
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==")) ;
         final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("-","+")) ;
         
@@ -770,18 +844,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
         
         if (validetoken2.contains(currentToken.getSymbole())){
-            AnalyseBinopAdd();
-            AnalyseAddExpr();
+            return new AddExpr( AnalyseBinopAdd(), AnalyseAddExpr());
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseMutExpr(){
+    private MutExpr AnalyseMutExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -791,15 +864,23 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
         
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseTerminalExpr();
-            AnalyseMutExprRest();
+            TermExpr termExpr = AnalyseTerminalExpr();
+            MutExpr mutExpr = AnalyseMutExprRest();
+
+            if (mutExpr == null){
+                return termExpr;
+            }
+            else {
+                mutExpr.setLeft(termExpr);
+                return mutExpr;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseMutExprRest(){
+    private MutExpr AnalyseMutExprRest(){
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-")) ;
         final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("*","//","%")) ;
 
@@ -810,18 +891,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken2.contains(currentToken.getSymbole())){
-            AnalyseBinopMut();
-            AnalyseMutExpr();
+            return new MutExpr( AnalyseBinopMut(),AnalyseMutExpr());
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseTerminalExpr(){
+    private TermExpr AnalyseTerminalExpr(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -832,17 +912,22 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("ident")){
             tokenQueue.poll();
-            AnalyseExprRestIdent();
+            Ident ident = new Ident(currentToken.getValue());
+            LinkedList<Expr> exprs = AnalyseExprRestIdent();
+
+            if (exprs == null){
+                return ident;
+            }
+            else return new IdentP(ident, exprs);
         }
         else if(currentToken.getSymbole().equals("(")){
             tokenQueue.poll();
 
-            AnalyseExpr();
+            Expr expr = AnalyseExpr();
 
-            
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals(")")){
-                tokenQueue.poll();
+                return new Parenthese(expr);
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -850,27 +935,26 @@ public class ParserV2 {
         }
         else if(currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
-            AnalyseExprEtoileVirgule();
-
+            
+            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
-                tokenQueue.poll();
+                return new ListType(exprs);
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
         else if(validetoken.contains(currentToken.getSymbole())){
-            AnalyseConst();
-
+            return AnalyseConst();
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " +  currentToken.getSymbole());
         }
     }
 
-    private void AnalyseExprRestIdent(){
+    private LinkedList<Expr> AnalyseExprRestIdent(){
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-","*","//","%")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -881,26 +965,26 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("(")){
             tokenQueue.poll();
-            AnalyseExprEtoileVirgule();
+            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
 
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals(")")){
-                return;
+                return exprs;
             }
             else{
                  throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprEtoileVirgule(){
+    private LinkedList<Expr> AnalyseExprEtoileVirgule(){
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -909,17 +993,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (currentToken.getSymbole().equals("ident")){
-            AnalyseIdentPlusVirgule();
+            return AnalyseExprPlusVirgule();
         }
         else if (currentToken.getSymbole().equals(")")){
-            return;
+            return null;
         } 
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprPlusVirgule(){
+    private LinkedList<Expr> AnalyseExprPlusVirgule(){
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
@@ -929,15 +1013,25 @@ public class ParserV2 {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            AnalyseExpr();
-            AnalyseExprPlusVirguleRest();
+            Expr expr = AnalyseExpr();
+            LinkedList<Expr> exprs = AnalyseExprPlusVirguleRest();
+
+            if (exprs == null){
+                LinkedList<Expr> newExprs = new LinkedList<>();
+                newExprs.add(expr);
+                return newExprs;
+            }
+            else {
+                exprs.addFirst(expr);
+                return exprs;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseExprPlusVirguleRest(){
+    private LinkedList<Expr> AnalyseExprPlusVirguleRest(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
@@ -946,17 +1040,17 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals(",")){
             tokenQueue.poll();
-            AnalyseExprPlusVirgule();
+            return AnalyseExprPlusVirgule();
         }
         else if(currentToken.getSymbole().equals(")")){
-            return;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopAdd(){
+    private AddBinop AnalyseBinopAdd(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
@@ -964,17 +1058,17 @@ public class ParserV2 {
         Token currentToken = tokenQueue.poll();
 
         if (currentToken.getSymbole().equals("+")){
-            return;
+            return AddBinop.ADD;
         }
         else if (currentToken.getSymbole().equals("-")){
-            return;
+            return AddBinop.SUB;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopMut(){
+    private MutBinop AnalyseBinopMut(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
@@ -982,21 +1076,21 @@ public class ParserV2 {
         Token currentToken = tokenQueue.poll();
 
         if (currentToken.getSymbole().equals("*")){
-            return;
+            return MutBinop.MULT;
         }
         else if (currentToken.getSymbole().equals("//")){
-            return;
+            return MutBinop.DIV;
         }
         else if (currentToken.getSymbole().equals("%")){
-             return;
+            return MutBinop.MOD;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseBinopComp(){
-        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+    private CompBinop AnalyseBinopComp(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -1004,8 +1098,23 @@ public class ParserV2 {
         
         Token currentToken = tokenQueue.poll();
 
-        if (validetoken1.contains(currentToken.getSymbole())){
-            return;
+        if (validetoken.contains(currentToken.getSymbole())){
+            switch (currentToken.getSymbole()) {
+                case "<" :
+                    return CompBinop.LESS_THAN;
+                case "<=" :
+                    return CompBinop.LESS_EQUAL;
+                case ">" :
+                    return CompBinop.GREATER_THAN;
+                case ">=" :
+                    return CompBinop.GREATER_EQUAL;
+                case "==" :
+                    return CompBinop.EQUAL;
+                case "!=" :
+                    return CompBinop.NOT_EQUAL;
+                default:
+                    return null;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
@@ -1045,7 +1154,7 @@ public class ParserV2 {
     }
 
     private Const AnalyseConst(){
-        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -1054,8 +1163,21 @@ public class ParserV2 {
         Token currentToken = tokenQueue.poll();
         
     
-        if (validetoken1.contains(currentToken.getSymbole())){
-            return;
+        if (validetoken.contains(currentToken.getSymbole())){
+            switch (currentToken.getSymbole()) {
+                case "integer" :
+                    return new IntegerType(Integer.valueOf(currentToken.getValue()));
+                case "string" :
+                    return new StringType(currentToken.getValue());
+                case "True" :
+                    return new BoolType(true);
+                case "False" :
+                    return new BoolType(false);
+                /*case "None" :
+                    return new NoneType();*/
+                default:
+                    return null;
+            }
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());

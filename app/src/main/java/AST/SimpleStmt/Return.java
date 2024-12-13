@@ -6,11 +6,15 @@ import java.io.IOException;
 import AST.Node;
 import AST.SimpleStmt.Expr.Expr;
 
-public class Return extends SimpleStmt {
+public class Return implements SimpleStmt {
     private Expr expr;
 
     public Return() {
         this.expr = null; 
+    }
+
+    public Return(Expr expr) {
+        this.expr = expr;
     }
 
     public Expr getExpr() {

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import AST.Stmt.Stmt;
 
-public class File extends Node{
+public class File implements Node{
     private List<Def> defs;
     private List<Stmt> stmts;
 

@@ -12,6 +12,10 @@ public class NotExpr extends AndExpr {
         this.expr = null;
     }
 
+    public NotExpr(NotExpr expr) {
+        this.expr = expr;
+    }
+
     public NotExpr getNotExpr() {
         return expr;
     }

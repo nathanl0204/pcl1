@@ -4,5 +4,5 @@
         "c:\\path\\to\\jarfile\\commons-logging-1.1.1.jar"
     ],
     "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "automatic"
 }

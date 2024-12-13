@@ -17,6 +17,11 @@ public class IdentP extends TermExpr {
         this.exprs = new ArrayList<Expr>();
     }
 
+    public IdentP(Ident ident, List<Expr> exprs) {
+        this.ident = ident;
+        this.exprs = exprs;
+    }
+
     public Ident getIdent() {
         return ident;
     }

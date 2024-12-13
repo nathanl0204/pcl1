@@ -6,7 +6,7 @@ import java.io.IOException;
 import AST.Node;
 import AST.SimpleStmt.Expr.Expr;
 
-public class AffectTab extends SimpleStmt {
+public class AffectTab implements SimpleStmt {
     private Expr expr1;  
     private Expr expr2;  
     private Expr expr3;  

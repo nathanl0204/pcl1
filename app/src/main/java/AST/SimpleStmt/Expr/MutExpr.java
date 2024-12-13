@@ -17,6 +17,12 @@ public class MutExpr extends AddExpr {
         this.right = null;
     }
 
+    public MutExpr(MutBinop binop, MutExpr right) {
+        this.symbole = binop;
+        this.left = null;
+        this.right = right;
+    }
+
     public MutBinop getMutSymbole() {
         return symbole;
     }

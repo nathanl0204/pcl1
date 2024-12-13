@@ -7,7 +7,7 @@ import AST.Node;
 import AST.Suite;
 import AST.SimpleStmt.Expr.Expr;
 
-public class IfElse extends Stmt {
+public class IfElse implements Stmt {
     private Expr ifExpr; 
     private Suite then;  
     private Suite elseBlock; 
@@ -16,6 +16,12 @@ public class IfElse extends Stmt {
         this.ifExpr = null;   
         this.then = null;    
         this.elseBlock = null;  
+    }
+
+    public IfElse(Expr ifExpr,Suite then,Suite elseBlock) {
+        this.ifExpr = ifExpr;   
+        this.then = then;    
+        this.elseBlock = elseBlock;  
     }
 
     public Expr getIf() {

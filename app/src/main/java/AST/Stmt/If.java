@@ -7,13 +7,18 @@ import AST.Node;
 import AST.Suite;
 import AST.SimpleStmt.Expr.Expr;
 
-public class If extends Stmt {
+public class If implements Stmt {
     private Expr ifExpr; 
     private Suite then;  
 
     public If() {
         this.ifExpr = null; 
         this.then = null; 
+    }
+
+    public If(Expr ifExpr,Suite then) {
+        this.ifExpr = ifExpr; 
+        this.then = then; 
     }
 
     public Expr getIf() {

@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
 
-public class OrExpr extends Expr {
+public class OrExpr implements Expr {
     private List<AndExpr> exprs;
 
     public OrExpr() {

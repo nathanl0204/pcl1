@@ -6,12 +6,16 @@ import java.io.IOException;
 import AST.Node;
 import AST.SimpleStmt.Expr.Expr;
 
-public class Print extends SimpleStmt {
+public class Print implements SimpleStmt {
     private Expr expr;
 
     // Constructeur
     public Print() {
         this.expr = null; // Par défaut, on initialise 'expr' à null
+    }
+
+    public Print(Expr expr) {
+        this.expr = expr;
     }
 
     // Getter pour 'expr'

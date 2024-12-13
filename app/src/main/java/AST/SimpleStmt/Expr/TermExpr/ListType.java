@@ -15,6 +15,10 @@ public class ListType extends TermExpr {
         this.exprs = new ArrayList<Expr>();
     }
 
+    public ListType(List<Expr> exprs) {
+        this.exprs = exprs;
+    }
+
     public List<Expr> getExprs() {
         return exprs;
     }

@@ -7,7 +7,7 @@ import AST.Suite;
 import AST.SimpleStmt.Expr.Expr;
 import AST.SimpleStmt.Expr.TermExpr.*;
 
-public class For {
+public class For implements Stmt{
     private Ident ident;
     private Expr expr;
     private Suite suite;
@@ -16,6 +16,12 @@ public class For {
         this.ident = null;
         this.expr = null;
         this.suite = null;
+    }
+
+    public For(Ident ident, Expr expr,Suite suite) {
+        this.ident = ident;
+        this.expr = expr;
+        this.suite = suite;
     }
 
     public Ident getIdent() {

@@ -6,7 +6,7 @@ import java.io.IOException;
 import AST.SimpleStmt.Expr.TermExpr.*;
 import AST.SimpleStmt.Expr.Expr;
 
-public class Affect extends SimpleStmt {
+public class Affect implements SimpleStmt {
     private Ident ident; 
     private Expr expr; 
 

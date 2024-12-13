@@ -12,6 +12,10 @@ public class Parenthese extends TermExpr {
         this.expr = null;
     }
 
+    public Parenthese(Expr expr) {
+        this.expr = expr;
+    }
+
     public Expr getExpr() {
         return expr;
     }

@@ -2,6 +2,6 @@ package AST.SimpleStmt.Expr;
 
 import AST.SimpleStmt.SimpleStmt;
 
-public abstract class Expr extends SimpleStmt {
-    public abstract Expr simplify();
+public interface Expr extends SimpleStmt {
+    public Expr simplify();
 }

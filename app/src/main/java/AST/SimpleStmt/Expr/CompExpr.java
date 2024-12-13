@@ -18,6 +18,12 @@ public class CompExpr extends NotExpr {
         this.right = null;
     }
 
+    public CompExpr(CompBinop binop, AddExpr right) {
+        this.symbole = binop;
+        this.left = null;
+        this.right = right;
+    }
+
     public CompBinop getCompSymbole() {
         return symbole;
     }
