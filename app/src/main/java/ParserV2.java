@@ -1,41 +1,16 @@
 
 import java.util.LinkedList;
-import java.util.List;
-import java.nio.channels.MulticastChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Queue;
 
 import ANALYSE.AnalyseException;
-import ANALYSE.ConvertToken;
 import AST.*;
-import AST.SimpleStmt.Affect;
-import AST.SimpleStmt.Print;
-import AST.SimpleStmt.Return;
-import AST.SimpleStmt.SimpleStmt;
-import AST.SimpleStmt.Expr.AddBinop;
-import AST.SimpleStmt.Expr.AddExpr;
-import AST.SimpleStmt.Expr.AndExpr;
-import AST.SimpleStmt.Expr.CompBinop;
-import AST.SimpleStmt.Expr.CompExpr;
-import AST.SimpleStmt.Expr.Expr;
-import AST.SimpleStmt.Expr.MutBinop;
-import AST.SimpleStmt.Expr.MutExpr;
-import AST.SimpleStmt.Expr.NotExpr;
-import AST.SimpleStmt.Expr.OrExpr;
-import AST.SimpleStmt.Expr.TermExpr.Ident;
-import AST.SimpleStmt.Expr.TermExpr.IdentP;
-import AST.SimpleStmt.Expr.TermExpr.ListType;
-import AST.SimpleStmt.Expr.TermExpr.Parenthese;
-import AST.SimpleStmt.Expr.TermExpr.TermExpr;
-import AST.SimpleStmt.Expr.TermExpr.Const.BoolType;
-import AST.SimpleStmt.Expr.TermExpr.Const.Const;
-import AST.SimpleStmt.Expr.TermExpr.Const.IntegerType;
-import AST.SimpleStmt.Expr.TermExpr.Const.StringType;
-import AST.Stmt.For;
-import AST.Stmt.If;
-import AST.Stmt.IfElse;
-import AST.Stmt.Stmt;
+import AST.SimpleStmt.*;
+import AST.SimpleStmt.Expr.*;
+import AST.SimpleStmt.Expr.TermExpr.*;
+import AST.SimpleStmt.Expr.TermExpr.Const.*;
+import AST.Stmt.*;
 
 public class ParserV2 {
     private Queue<Token> tokenQueue = new LinkedList<Token>();
@@ -336,7 +311,6 @@ public class ParserV2 {
 
             SimpleStmt simpleStmt = AnalyseSimpleStmt();
 
-
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("NEWLINE")){
                 return new Suite( Arrays.asList(simpleStmt) );
@@ -373,10 +347,35 @@ public class ParserV2 {
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
         }
+
+
         else if(validetoken.contains(currentToken.getSymbole())){
 
             Expr expr = AnalyseOrExpr();
-            AnalyseSimpleStmtFact();
+            SimpleStmt suite = AnalyseSimpleStmtFact();
+
+            if ( suite == null){
+                return expr;
+            }
+            else {
+                if (suite instanceof ExprTab){
+                    ((ExprTab) suite).setLeft(expr);
+                }
+                else if (suite instanceof Affect){
+
+                    if ( ((Affect) suite).getLeft() == null ){ // Cas d'une affectation classique : expr = expr
+                        ((Affect) suite).setLeft(expr);
+                    }
+                    else { // Cas d'une affectation de type tableau : expr ([ expr ])* = expr
+                        ((ExprTab) ((Affect) suite).getLeft()).setLeft(expr);
+                    }
+                    return suite;
+
+                }
+            }
+            throw new AnalyseException("PB avec l'affectation dans SimpleStmt");
+                
+            
             
         }
         else if(currentToken.getSymbole().equals("return")){
@@ -412,7 +411,7 @@ public class ParserV2 {
 
     }
 
-    private void AnalyseSimpleStmtFact(){
+    private SimpleStmt AnalyseSimpleStmtFact(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
@@ -422,31 +421,47 @@ public class ParserV2 {
         Token currentToken = tokenQueue.poll();
 
         if(validetoken.contains(currentToken.getSymbole())){
-            AnalyseSimpleStmtFactFact();
+            Expr expr = AnalyseSimpleStmtFactFact();
+
+            if (expr != null){
+                return new Affect(expr);
+            }
+            return null;
         }
         else if(currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
 
-
-            AnalyseExpr();
-
-
+            Expr expr = AnalyseExpr();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
-                AnalyseExprCrochetEtoile();
+                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+
+                if (exprs == null){
+                    exprs = new LinkedList<>();
+                }
+                exprs.addFirst(expr);
+                ExprTab exprTab = new ExprTab(exprs);
+
+
+                Expr rightExpr = AnalyseSimpleStmtFactFact();
+                if (rightExpr == null){
+                    return exprTab;
+                }
+                else {
+                    return new Affect(exprTab,rightExpr);
+                }
             }
             else{
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
             }
-            
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
         }
     }
 
-    private void AnalyseSimpleStmtFactFact(){
+    private Expr AnalyseSimpleStmtFactFact(){
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
@@ -456,10 +471,10 @@ public class ParserV2 {
         if (currentToken.getSymbole().equals("=")){
             tokenQueue.poll();
 
-            AnalyseExpr();
+            return AnalyseExpr();
         }
         else if (currentToken.getSymbole().equals("NEWLINE")){
-            return ;
+            return null;
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());

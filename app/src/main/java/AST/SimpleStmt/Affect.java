@@ -3,57 +3,61 @@ package AST.SimpleStmt;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import AST.SimpleStmt.Expr.TermExpr.*;
 import AST.SimpleStmt.Expr.Expr;
 
 public class Affect implements SimpleStmt {
-    private Ident ident; 
-    private Expr expr; 
+    private Expr leftExpr; 
+    private Expr rightExpr; 
 
     public Affect() {
-        this.ident = null;  
-        this.expr = null; 
+        this.leftExpr = null;  
+        this.rightExpr = null; 
     }
 
-    public Affect(Ident ident, Expr expr) {
-        this.ident = ident;
-        this.expr = expr;
+    public Affect( Expr rightExpr) {
+        this.leftExpr = null;  
+        this.rightExpr = rightExpr; 
     }
 
-    public Ident getIdent() {
-        return ident;
+    public Affect(Expr leftExpr, Expr rightExpr) {
+        this.leftExpr = leftExpr;
+        this.rightExpr = rightExpr;
     }
 
-    public void setIdent(Ident ident) {
-        this.ident = ident;
+    public Expr getLeft() {
+        return leftExpr;
     }
 
-    public Expr getExpr() {
-        return expr;
+    public void setLeft(Expr leftExpr) {
+        this.leftExpr = leftExpr;
     }
 
-    public void setExpr(Expr expr) {
-        this.expr = expr;
+    public Expr getRight() {
+        return rightExpr;
+    }
+
+    public void setRight(Expr rightExpr) {
+        this.rightExpr = rightExpr;
     }
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"AFFECT\"];\n");
 
-        if (this.ident != null) {
-            String identNodeName = nodeName + "_ident"; 
-            writer.write("  " + nodeName + " -- " + identNodeName + ";\n");
-            this.ident.vizualisation(writer, identNodeName);
+        if (this.leftExpr != null) {
+            String leftExprNodeName = nodeName + "_leftExpr"; 
+            writer.write("  " + nodeName + " -- " + leftExprNodeName + ";\n");
+            this.leftExpr.vizualisation(writer, leftExprNodeName);
         }
 
-        if (this.expr != null) {
-            String exprNodeName = nodeName + "_expr"; 
-            writer.write("  " + nodeName + " -- " + exprNodeName + ";\n");
-            this.expr.vizualisation(writer, exprNodeName); 
+        if (this.rightExpr != null) {
+            String rightExprNodeName = nodeName + "_rightExpr"; 
+            writer.write("  " + nodeName + " -- " + rightExprNodeName + ";\n");
+            this.rightExpr.vizualisation(writer, rightExprNodeName); 
         }
     }
 
     public Affect simplify(){
-        expr = expr.simplify();
+        rightExpr = rightExpr.simplify();
         return this;
     }
 }
