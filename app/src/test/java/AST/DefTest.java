@@ -19,7 +19,7 @@ class DefTest {
     void testAddIdent() {
         Def def = new Def();
         Ident ident = new Ident();
-        def.addIdent(ident);
+        def.setIdent(ident);
         assertEquals(1, def.getIdents().size(), "La liste des idents devrait contenir un ident après l'ajout");
     }
 
@@ -34,7 +34,8 @@ class DefTest {
     @Test
     void testSetSuite() {
         Def def = new Def();
-        Stmt suite = new If(); // Classe anonyme pour tester
+        Suite suite = new Suite();
+        suite.addStmt(new If()); // Classe anonyme pour tester
         def.setSuite(suite);
         assertEquals(suite, def.getSuite(), "La suite ne correspond pas après l'appel de setSuite");
     }

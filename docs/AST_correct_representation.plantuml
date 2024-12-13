@@ -2,6 +2,7 @@
     class AST extends Node {
         - File root
     }
+    AST o--- File
 
     interface Node {
         + void vizualisation(BufferedWriter writer,  String nodeName) throws IOException
@@ -17,6 +18,8 @@
         + List<Stmt> getStmts()
         + void addStmt(Stmt stmt)
     }
+    File o--- "*" Def
+    File o--- "*" Stmt
 
     class Def implements Node {
         - Ident ident
@@ -30,6 +33,9 @@
         + Stmt getSuite()
         + void setSuite(Stmt suite)
     }
+    Def o--- Ident
+    Def o--- Stmt
+    Def o--- "*" Ident
 
     class Suite implements Node {
         - List<Stmt> stmts
@@ -37,6 +43,7 @@
         + List<Stmt> getStmts()
         + void addStmt(Stmt stmt)
     }
+    Suite o--- "*" Stmt
 
     interface SimpleStmt extends Stmt
 
@@ -46,6 +53,7 @@
         + Expr getExpr()
         + void setExpr(Expr expr)
     }
+    Return o--- Expr
 
     class Print implements SimpleStmt {
         - Expr expr
@@ -53,6 +61,7 @@
         + Expr getExpr()
         + void setExpr(Expr expr)
     }
+    Print o--- Expr
 
     class Affect implements SimpleStmt {
         - Expr leftExpr
@@ -63,6 +72,7 @@
         + Expr getExpr()
         + void setExpr(Expr expr)
     }
+    Affect o--- "2" Expr
 
     interface Stmt extends Node
 
@@ -75,6 +85,8 @@
         + Suite getThen()
         + void setThen(Suite then)
     }
+    If o--- Expr
+    If o--- Suite
 
     class IfElse implements Stmt {
         - Expr ifExpr
@@ -88,6 +100,9 @@
         + Suite getElse()
         + void setElse(Suite elseBlock)
     }
+    IfElse o--- Expr
+    IfElse o--- "2" Suite
+
 
     class For implements Stmt {
         - Ident ident
@@ -100,7 +115,10 @@
         + void setExpr(Expr expr)
         + Suite getSuite()
         + void setSuite(Suite suite)
-    }
+    } 
+    For o--- Expr
+    For o--- Ident
+    For o--- Suite
 
     interface Expr extends SimpleStmt 
 
@@ -110,6 +128,7 @@
         + List<AndExpr> getOrExprs()
         + void addOrExpr(AndExpr expr)
     }
+    OrExpr o--- "*" AndExpr
 
     class AndExpr extends OrExpr{
         - List<NotExpr> exprs
@@ -117,6 +136,7 @@
         + List<NotExpr> getAndExprs()
         + void addAndExpr(NotExpr expr)
     }
+    AndExpr o--- "*" NotExpr
     
     class NotExpr extends AndExpr {
         - NotExpr expr
@@ -124,6 +144,7 @@
         + NotExpr getNotExpr()
         + void setNotExpr(NotExpr expr) 
     }
+    NotExpr o--- NotExpr
 
     class CompExpr extends NotExpr {
         - CompBinop symbole
@@ -137,6 +158,7 @@
         + AddExpr getRight()
         + void setRight(AddExpr right)
     }
+    CompExpr o--- "2" AddExpr
 
     enum CompBinop {
         LESS_THAN
@@ -165,6 +187,7 @@
         + AddExpr getRight()
         + void setRight(AddExpr right)
     }
+    AddExpr o--- "2" AddExpr
 
     enum AddBinop {
         ADD 
@@ -185,13 +208,13 @@
         + MutExpr getRight()
         + void setRight(MutExpr right)
     }
+    MutExpr o--- "2" MutExpr
 
     enum MutBinop {
         MULT
         DIV
         MOD
     }
-
     MutExpr -- MutBinop
 
     class MinusExpr extends MutExpr  {
@@ -200,6 +223,7 @@
         + MinusExpr getMinusExpr()
         + void setMinusExpr(MinusExpr expr) 
     }
+    MinusExpr o--- MinusExpr
 
     abstract class TermExpr extends MinusExpr
 
@@ -212,6 +236,8 @@
         + List<Expr> getExprs()
         + void addExprs(Expr expr)
     }
+    IdentP o--- Ident
+    IdentP o--- "*" Expr
 
     class Ident extends TermExpr {
         - String name
@@ -227,6 +253,8 @@
         + List<Expr> getExprs()
         + void addExprs(Expr expr)
     }
+    List o--- "*" Expr
+
 
     class Parenthese extends TermExpr {
         - Expr expr
@@ -234,6 +262,7 @@
         + Expr getExpr()
         + void setExpr(Expr expr)
     }
+    Parenthese o--- Expr
     
     abstract class Const extends TermExpr 
   

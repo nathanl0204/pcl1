@@ -11,6 +11,11 @@ public class File implements Node{
     private List<Def> defs;
     private List<Stmt> stmts;
 
+    public File(){
+        this.defs = null;
+        this.stmts = null;
+    }
+
     public File(List<Def> defs,List<Stmt> stmts){
         this.defs = defs;
         this.stmts = stmts;
