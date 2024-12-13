@@ -1,5 +1,6 @@
 
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Queue;
 
@@ -28,7 +29,7 @@ public class ParserV2 {
     }
     
     private File AnalyseFile(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -132,7 +133,7 @@ public class ParserV2 {
     }
 
     private LinkedList<Def> AnalyseDefEtoile(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -167,7 +168,7 @@ public class ParserV2 {
     }
 
     private LinkedList<Stmt> AnalyseStmtPlus(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -195,7 +196,7 @@ public class ParserV2 {
     }
 
     private LinkedList<Stmt> AnalyseStmtPlusRest(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList( "EOF","END")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -281,7 +282,7 @@ public class ParserV2 {
     }
 
     private Suite AnalyseSuite(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -335,7 +336,7 @@ public class ParserV2 {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         Token currentToken = tokenQueue.peek();
 
@@ -396,7 +397,7 @@ public class ParserV2 {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "NEWLINE","=")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "NEWLINE","=")) ;
 
         Token currentToken = tokenQueue.poll();
 
@@ -446,7 +447,7 @@ public class ParserV2 {
     }
 
     private Stmt AnalyseStmt(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
     
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -522,7 +523,7 @@ public class ParserV2 {
     }
 
     private void AnalyseStmtElse(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -553,7 +554,7 @@ public class ParserV2 {
     }
 
     private Expr AnalyseExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -572,7 +573,7 @@ public class ParserV2 {
     }
 
     private void AnalyseExprCrochetEtoile(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -601,7 +602,7 @@ public class ParserV2 {
     }
 
     private void AnalyseOrExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -619,7 +620,7 @@ public class ParserV2 {
     }
 
     private void AnalyseOrExprRest(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -640,7 +641,7 @@ public class ParserV2 {
     }
 
     private void AnalyseAndExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -658,7 +659,7 @@ public class ParserV2 {
     }
 
     private void AnalyseAndExprRest(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -679,7 +680,7 @@ public class ParserV2 {
     }
 
     private void AnalyseNotExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -700,7 +701,7 @@ public class ParserV2 {
     }
 
     private void AnalyseCompExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -740,7 +741,7 @@ public class ParserV2 {
     }
 
     private void AnalyseAddExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -781,7 +782,7 @@ public class ParserV2 {
     }
 
     private void AnalyseMutExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -821,7 +822,7 @@ public class ParserV2 {
     }
 
     private void AnalyseTerminalExpr(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
@@ -919,7 +920,7 @@ public class ParserV2 {
     }
 
     private void AnalyseExprPlusVirgule(){
-        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
