@@ -1,6 +1,9 @@
+import GeneralTree.*;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class Parser {
@@ -12,6 +15,7 @@ public class Parser {
     private ArrayList<String> grammar_stack = new ArrayList<>();
     private boolean reading_done;
     private Tree tree;
+    private GeneralTree complex_AST;
     
     public Parser(ArrayList<String[]> token_stack) {
         this.ll1_table = getLL1table();
@@ -21,6 +25,7 @@ public class Parser {
         this.grammar_stack = new ArrayList<>();
         this.grammar_stack.add("$");
         this.grammar_stack.add("file");
+        this.complex_AST = null;
     }
 
     public Map<String, Map<String, String[]>> getLL1table() {
@@ -195,13 +200,18 @@ public class Parser {
     public void top_down_parsing_algorithm() {
         this.remove_unecessary_tokens();
 
+        LinkedList<GeneralTree> treesList = new LinkedList<>();
+        GeneralTree parsing_tree = new GeneralTree("file");
+        treesList.addLast(parsing_tree);
+        int index_where_add_children = 0;
+
         while (!this.reading_done) {
             String X = this.grammar_stack.get(this.grammar_stack.size() - 1);
             this.grammar_stack.remove(this.grammar_stack.size() - 1);
 
             String[] a = getCurrentToken();
 
-            System.out.print(X.toString() + " | " + Arrays.toString(a) + " | ");
+            //System.out.print(X.toString() + " | " + Arrays.toString(a) + " | ");
 
             if (is_in_array(this.non_terminals, X)) {
                 String[] current_rule;
@@ -221,20 +231,28 @@ public class Parser {
 
                 if (terminal_length > 0) {
                     if (!current_rule[0].equals("ε")) {
+                        GeneralTree parent = treesList.get(index_where_add_children);
                         for (int i = 0; i<terminal_length; i++) {
                             String node = current_rule[terminal_length - 1 - i];
                             this.grammar_stack.add(node);
+                            GeneralTree child = new GeneralTree(node);
+                            parent.addChild(child);
+                            treesList.addLast(child);
                         }
+                        treesList.removeFirst();
     
-                        System.out.println(X.toString() + " -> " + Arrays.toString(current_rule));
+                       // System.out.println(X.toString() + " -> " + Arrays.toString(current_rule));
                     }
                     else {
-                        System.out.println("On ne fait rien (epsilon)");
+                        treesList.removeFirst();
+
+                        // System.out.println("On ne fait rien (epsilon)");
                     }
                 }
-                else {
+                else {                 
+                    treesList.removeFirst();
                     this.errors_stack.add("Expression invalide ligne " + a[2].toString());
-                    System.out.println("On skip ce non terminal: " + X.toString());
+                    // System.out.println("On skip ce non terminal: " + X.toString());
                 }
             }
             else {
@@ -245,15 +263,24 @@ public class Parser {
                     this.reading_done = true;
                 }
                 else if (!X.equals(getConvertedValue(a))) {
+                    treesList.removeFirst();
+
                     this.errors_stack.add(getConvertedValue(a).toString() + ": ce caractère n'est pas attendu à la ligne" + a[2].toString());
-                    System.out.println("On skip ce token: " + X.toString());
+                    //System.out.println("On skip ce token: " + X.toString());
                 }
                 else {
+                    treesList.removeFirst();
+
                     this.token_stack.remove(0);
-                    System.out.println("On écrit le token: " + Arrays.toString(a));
+                    //System.out.println("On écrit le token: " + Arrays.toString(a));
                 }
             }
         }
+        this.complex_AST = parsing_tree;
+    }
+
+    public void printComplexAST() {
+        this.complex_AST.printTreeDot();
     }
 }
 
