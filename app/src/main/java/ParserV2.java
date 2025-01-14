@@ -13,10 +13,15 @@ import AST.SimpleStmt.Expr.TermExpr.Const.*;
 import AST.Stmt.*;
 
 public class ParserV2 {
-    private Queue<Token> tokenQueue = new LinkedList<Token>();
+    private Queue<Token> tokenQueue;
 
-    public ParserV2(Queue<Token> tokenQueue){
-        this.tokenQueue = tokenQueue;
+    public void setTokenQueueFromTokenStack(ArrayList<String[]> stack) {
+        Queue<Token> queue = new LinkedList<Token>();
+        for (int i = 0; i<stack.size(); i++) {
+            String[] previous_token = stack.get(i);
+            queue.add(new Token(previous_token[0], previous_token[1], previous_token[2]));
+        }
+        this.tokenQueue = queue;
     }
 
     public void startAnalyse(){
@@ -41,7 +46,7 @@ public class ParserV2 {
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("EOF")){
-                System.out.println("MOT RECONNUE | AUCUN PROBLEME");
+                System.out.println("MOT RECONNU | AUCUN PROBLEME");
                 return file;
             }
 
