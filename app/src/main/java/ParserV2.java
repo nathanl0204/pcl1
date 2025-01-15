@@ -159,7 +159,7 @@ public class ParserV2 {
 
         }
         else if (validetoken.contains(currentToken.getSymbole())){
-            return null;
+            return new LinkedList<>();
         }
         else{
             throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());

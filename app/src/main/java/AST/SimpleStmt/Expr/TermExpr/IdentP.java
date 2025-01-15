@@ -39,7 +39,7 @@ public class IdentP extends TermExpr {
     }
     
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\"IDENT\"];\n");
+        writer.write("  " + nodeName + " [label=\"FCT\"];\n");
 
         if (ident != null ){
             String identNodeName = nodeName + "_" + ident.hashCode(); 

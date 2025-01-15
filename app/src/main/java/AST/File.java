@@ -41,19 +41,24 @@ public class File implements Node{
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"File\"];\n");
 
-
-        if (defs != null){
-            for (Def def : defs){
-                String defNodeName = nodeName + "_" + def.hashCode(); 
-                writer.write("  " + nodeName + " -- " + defNodeName + ";\n");
-                def.vizualisation(writer,defNodeName); 
-            }
+        String defsNodeName = nodeName + "_defs";
+        writer.write("  " + nodeName + " -- " + defsNodeName + ";\n");
+        writer.write("  " + defsNodeName + " [label=\"DEFS\"];\n");
+        
+        for (Def def : defs.reversed()){
+            String defNodeName = defsNodeName + "_" + def.hashCode(); 
+            writer.write("  " + defsNodeName + " -- " + defNodeName + ";\n");
+            def.vizualisation(writer, defNodeName); 
         }
 
-        for (Stmt stmt : stmts){
-            String stmtNodeName = nodeName + "_" + stmt.hashCode(); 
-            writer.write("  " + nodeName + " -- " + stmtNodeName + ";\n");
-            stmt.vizualisation(writer,stmtNodeName); 
+        String stmtsNodeName = nodeName + "_stmts";
+        writer.write("  " + nodeName + " -- " + stmtsNodeName + ";\n");
+        writer.write("  " + stmtsNodeName + " [label=\"STMT\"];\n");
+        
+        for (Stmt stmt : stmts.reversed()){
+            String stmtNodeName = stmtsNodeName + "_" + stmt.hashCode(); 
+            writer.write("  " + stmtsNodeName + " -- " + stmtNodeName + ";\n");
+            stmt.vizualisation(writer, stmtNodeName); 
         }
 
     }

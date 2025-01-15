@@ -13,10 +13,10 @@ public class Main {
         }
         else {
             //"src/main/resources/test.py"
-            System.out.println("\n\nExecution du Lexeur\n\n");;
+            System.out.println("\nExecution du Lexeur\n");;
             Lexeur.execute(args[1]);
             if (args[0].equals("Parser")){
-                System.out.println("\n\nExecution du Parseur\n\n");
+                System.out.println("\nExecution du Parseur\n");
                 /*Parser parser = new Parser(Lexeur.token_stack);
                 parser.top_down_parsing_algorithm();
                 parser.printComplexAST();*/

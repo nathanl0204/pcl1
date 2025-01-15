@@ -411,7 +411,7 @@ public class Lexeur {
                 }
             }
 
-            print_tokens(token_stack);
+            //print_tokens(token_stack);
 
             reader.close();
         } catch (IOException e) {
