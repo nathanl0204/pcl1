@@ -30,7 +30,7 @@ public class Main {
                 FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
             
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write("digraph G {\n");
+                bufferedWriter.write("graph G {\n");
                 result.vizualisation(bufferedWriter, "root");
                 bufferedWriter.write("}\n");
                 bufferedWriter.close();

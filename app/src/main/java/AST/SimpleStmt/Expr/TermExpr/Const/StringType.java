@@ -23,7 +23,7 @@ public class StringType extends Const {
     }
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\""+value+"\"];\n");
+        writer.write("  " + nodeName + " [label="+value+"];\n");
     }
 
     public StringType simplify(){

@@ -49,26 +49,27 @@ public class For implements Stmt{
     }
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\"IF_THEN\"];\n");
-
+        writer.write("  " + nodeName + " [label=\"FOR\"];\n");
+    
         if (this.ident != null) {
-            String identNodeName = nodeName + "_if"; 
+            String identNodeName = nodeName + "_ident";
             writer.write("  " + nodeName + " -- " + identNodeName + ";\n");
             this.ident.vizualisation(writer, identNodeName);
         }
-
+    
         if (this.expr != null) {
-            String exprNodeName = nodeName + "_then"; 
+            String exprNodeName = nodeName + "_expr";
             writer.write("  " + nodeName + " -- " + exprNodeName + ";\n");
-            this.expr.vizualisation(writer, exprNodeName); 
+            this.expr.vizualisation(writer, exprNodeName);
         }
-
+    
         if (this.suite != null) {
-            String suiteNodeName = nodeName + "_else"; 
+            String suiteNodeName = nodeName + "_suite";
             writer.write("  " + nodeName + " -- " + suiteNodeName + ";\n");
-            this.suite.vizualisation(writer, suiteNodeName); 
+            this.suite.vizualisation(writer, suiteNodeName);
         }
     }
+    
 
     public For simplify(){
         expr = expr.simplify();

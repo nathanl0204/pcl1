@@ -52,9 +52,8 @@ public class File implements Node{
 
         for (Stmt stmt : stmts){
             String stmtNodeName = nodeName + "_" + stmt.hashCode(); 
-            
-            stmt.vizualisation(writer,stmtNodeName); 
             writer.write("  " + nodeName + " -- " + stmtNodeName + ";\n");
+            stmt.vizualisation(writer,stmtNodeName); 
         }
 
     }
