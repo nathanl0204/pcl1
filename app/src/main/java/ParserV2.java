@@ -24,8 +24,8 @@ public class ParserV2 {
         this.tokenQueue = queue;
     }
 
-    public void startAnalyse(){
-        AnalyseFile();
+    public File startAnalyse(){
+        return AnalyseFile();
     }
     
     private File AnalyseFile(){
@@ -471,10 +471,8 @@ public class ParserV2 {
         }
         
         Token currentToken = tokenQueue.peek();
-        System.out.println("je passe ici");
         if (currentToken.getSymbole().equals("=")){
             tokenQueue.poll();
-            System.out.println("je passe ici");
             return AnalyseExpr();
         }
         else if (currentToken.getSymbole().equals("NEWLINE")){
@@ -953,15 +951,14 @@ public class ParserV2 {
         }
         else if(currentToken.getSymbole().equals("[")){
             tokenQueue.poll();
-            
             LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
-
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
 
                 return new ListType(exprs);
             }
             else{
+
                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
@@ -1063,7 +1060,7 @@ public class ParserV2 {
             tokenQueue.poll();
             return AnalyseExprPlusVirgule();
         }
-        else if(currentToken.getSymbole().equals(")")){
+        else if(currentToken.getSymbole().equals(")") || currentToken.getSymbole().equals("]")){
             return null;
         }
         else{
