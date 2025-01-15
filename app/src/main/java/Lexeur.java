@@ -316,8 +316,9 @@ public class Lexeur {
                                     String[] item = {"ws", "END", String.valueOf(line_number)};
                                     String[] last_item = token_stack.get(token_stack.size() - 1);
                                     token_stack.remove(token_stack.size() - 1);
-                                    token_stack.add(item);
                                     token_stack.add(last_item);
+                                    token_stack.add(item);
+                                    
                                 }
 
                                 ind_stack_len = indentations_stack.size();

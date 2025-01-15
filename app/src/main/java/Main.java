@@ -8,17 +8,17 @@ public class Main {
         }
         else {
             //"src/main/resources/test.py"
-            System.out.println("Execution du Lexeur");;
+            System.out.println("\n\nExecution du Lexeur\n\n");;
             Lexeur.execute(args[1]);
             if (args[0].equals("Parser")){
-                System.out.println("\nExecution du Parseur");
-                Parser parser = new Parser(Lexeur.token_stack);
+                System.out.println("\n\nExecution du Parseur\n\n");
+                /*Parser parser = new Parser(Lexeur.token_stack);
                 parser.top_down_parsing_algorithm();
-                parser.printComplexAST();
+                parser.printComplexAST();*/
 
-                /*ParserV2 parserV2 = new ParserV2();
+                ParserV2 parserV2 = new ParserV2();
                 parserV2.setTokenQueueFromTokenStack(Lexeur.token_stack);
-                parserV2.startAnalyse();*/
+                parserV2.startAnalyse();
             }
         }
     }

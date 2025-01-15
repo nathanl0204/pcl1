@@ -10,14 +10,9 @@ if a < b:
     print("test")
 else:
     print("test")
-
 for x in range(5):
     print(x)
-
-def addition(x, y):
-    return x + y
-
 resultat = addition(a, b)
-print("Le résultat de l'addition est:", resultat)
-
+print("Le résultat de l'addition est:")
+print(resultat)
 liste = [1, 2, 3, 4, 5]

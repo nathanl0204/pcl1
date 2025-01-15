@@ -53,7 +53,7 @@ public class ParserV2 {
             
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
         return null;
     }
@@ -73,7 +73,7 @@ public class ParserV2 {
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -109,26 +109,26 @@ public class ParserV2 {
                             return def;
                         }
                         else{
-                            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                         }
 
                     }
                     else{
-                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                     }
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
             
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -162,7 +162,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
         
     }
@@ -191,7 +191,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -212,7 +212,7 @@ public class ParserV2 {
             return null;
         }   
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -230,7 +230,7 @@ public class ParserV2 {
             return null;
         }
         else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -258,7 +258,7 @@ public class ParserV2 {
             }
         }
         else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -277,7 +277,7 @@ public class ParserV2 {
             return AnalyseIdentPlusVirgule();
         }
         else {
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -302,12 +302,12 @@ public class ParserV2 {
                     return suite;
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                 }
 
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
 
@@ -321,11 +321,11 @@ public class ParserV2 {
                 return new Suite( Arrays.asList(simpleStmt) );
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -349,7 +349,7 @@ public class ParserV2 {
                 return new Affect( ident , AnalyseExpr() );
             }
             else {
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
 
@@ -402,16 +402,16 @@ public class ParserV2 {
                     return print;
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
             
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -423,7 +423,7 @@ public class ParserV2 {
         
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "NEWLINE","=")) ;
 
-        Token currentToken = tokenQueue.poll();
+        Token currentToken = tokenQueue.peek();
 
         if(validetoken.contains(currentToken.getSymbole())){
             Expr expr = AnalyseSimpleStmtFactFact();
@@ -434,7 +434,6 @@ public class ParserV2 {
             return null;
         }
         else if(currentToken.getSymbole().equals("[")){
-            tokenQueue.poll();
 
             Expr expr = AnalyseExpr();
 
@@ -458,11 +457,11 @@ public class ParserV2 {
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -472,17 +471,17 @@ public class ParserV2 {
         }
         
         Token currentToken = tokenQueue.peek();
-
+        System.out.println("je passe ici");
         if (currentToken.getSymbole().equals("=")){
             tokenQueue.poll();
-
+            System.out.println("je passe ici");
             return AnalyseExpr();
         }
         else if (currentToken.getSymbole().equals("NEWLINE")){
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -505,7 +504,7 @@ public class ParserV2 {
                 return simpleStmt;
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
             
         }
@@ -514,11 +513,11 @@ public class ParserV2 {
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("ident")){
-
+                
                 Ident ident = new Ident(currentToken.getValue());
                 currentToken = tokenQueue.poll();
                 if(currentToken.getSymbole().equals("in")){
-                    
+
                     Expr expr = AnalyseExpr();
 
                     currentToken = tokenQueue.poll();
@@ -528,16 +527,16 @@ public class ParserV2 {
 
                     }
                     else{
-                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                        throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                     }
                 }
                 else{
-                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                    throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
                 }
                 
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else if (currentToken.getSymbole().equals("if")){
@@ -558,12 +557,12 @@ public class ParserV2 {
                 
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
 
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -586,7 +585,7 @@ public class ParserV2 {
                 return AnalyseSuite();
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne t: " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne t: " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
 
         }
@@ -594,7 +593,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -619,7 +618,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -650,14 +649,14 @@ public class ParserV2 {
                 }
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else if (validetoken.contains(currentToken.getSymbole())){
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -683,7 +682,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -704,7 +703,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -730,7 +729,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -751,7 +750,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -772,7 +771,7 @@ public class ParserV2 {
             return new NotExpr(AnalyseNotExpr());
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -798,7 +797,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -819,7 +818,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -846,7 +845,7 @@ public class ParserV2 {
 
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -868,7 +867,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -894,7 +893,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -915,7 +914,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -926,10 +925,11 @@ public class ParserV2 {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
+        
         Token currentToken = tokenQueue.peek();
-
         if (currentToken.getSymbole().equals("ident")){
             tokenQueue.poll();
+
             Ident ident = new Ident(currentToken.getValue());
             LinkedList<Expr> exprs = AnalyseExprRestIdent();
 
@@ -948,7 +948,7 @@ public class ParserV2 {
                 return new Parenthese(expr);
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else if(currentToken.getSymbole().equals("[")){
@@ -958,10 +958,11 @@ public class ParserV2 {
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
+
                 return new ListType(exprs);
             }
             else{
-                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else if(validetoken.contains(currentToken.getSymbole())){
@@ -983,41 +984,43 @@ public class ParserV2 {
 
         if (currentToken.getSymbole().equals("(")){
             tokenQueue.poll();
-            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
 
+            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals(")")){
                 return exprs;
             }
             else{
-                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+                 throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
             }
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
     private LinkedList<Expr> AnalyseExprEtoileVirgule(){
-        
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList(")","]"));
+
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
         
         Token currentToken = tokenQueue.peek();
 
-        if (currentToken.getSymbole().equals("ident")){
+        if (validetoken.contains(currentToken.getSymbole())){
             return AnalyseExprPlusVirgule();
         }
-        else if (currentToken.getSymbole().equals(")")){
+        else if (validetoken2.contains(currentToken.getSymbole())){
             return null;
         } 
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1045,7 +1048,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1064,7 +1067,7 @@ public class ParserV2 {
             return null;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1082,7 +1085,7 @@ public class ParserV2 {
             return AddBinop.SUB;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1103,7 +1106,7 @@ public class ParserV2 {
             return MutBinop.MOD;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1135,7 +1138,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
     }
 
@@ -1150,7 +1153,7 @@ public class ParserV2 {
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -1166,7 +1169,7 @@ public class ParserV2 {
             return;
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
@@ -1198,7 +1201,7 @@ public class ParserV2 {
             }
         }
         else{
-            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine());
+            throw new AnalyseException("Erreur non reconnue, ligne : " + currentToken.getLine() + " " + currentToken.getSymbole());
         }
 
     }
