@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import java.io.File;
+import java.io.PrintWriter;
 
 public class LexeurTest {
 
@@ -16,31 +18,51 @@ public class LexeurTest {
     }
 
     @Test
-    public void testLexeurTokens() throws IOException {
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader("src/main/resources/test.py"))) {
-            for (int i = 0; i < 2; i++) { // Modifier la valeur de i ici en fonction du nombre de lignes à lire
-                String line = reader.readLine();
-                if (line == null) break;
-                content.append(line).append("\n");
-            }
+    public void testLexeurExecute() throws IOException {
+        File tempFile = File.createTempFile("test", ".py");
+        tempFile.deleteOnExit();
+        
+        try (PrintWriter writer = new PrintWriter(tempFile)) {
+            writer.println("def i(a,b,c) :");
+            writer.println("    return --o+-a-y*j*3-j//-u*p");
         }
 
-        try (BufferedReader testReader = new BufferedReader(new java.io.StringReader(content.toString()))) {
-            Lexeur.Lex(testReader, 0, true, false);
-        }
+        Lexeur.execute(tempFile.getAbsolutePath());
 
         ArrayList<String[]> expectedTokens = new ArrayList<>();
-
-        // Ajouter les tokens attendus ici
         
-        expectedTokens.add(new String[]{"word", "a", "1"});
-        expectedTokens.add(new String[]{"op", "=", "1"});
-        expectedTokens.add(new String[]{"number", "10", "1"});
+        expectedTokens.add(new String[]{"keyword", "def", "1"});
+        expectedTokens.add(new String[]{"id", "i", "1"});
+        expectedTokens.add(new String[]{"op", "LP", "1"});
+        expectedTokens.add(new String[]{"id", "a", "1"});
+        expectedTokens.add(new String[]{"op", "COM", "1"});
+        expectedTokens.add(new String[]{"id", "b", "1"});
+        expectedTokens.add(new String[]{"op", "COM", "1"});
+        expectedTokens.add(new String[]{"id", "c", "1"});
+        expectedTokens.add(new String[]{"op", "RP", "1"});
+        expectedTokens.add(new String[]{"op", "DD", "1"});
         expectedTokens.add(new String[]{"ws", "NEWLINE", "1"});
-        expectedTokens.add(new String[]{"word", "b", "2"});
-        expectedTokens.add(new String[]{"op", "=", "2"});
-        expectedTokens.add(new String[]{"number", "20", "2"});
+        expectedTokens.add(new String[]{"ws", "BEGIN", "2"});
+        expectedTokens.add(new String[]{"keyword", "return", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"id", "o", "2"});
+        expectedTokens.add(new String[]{"op", "ADD", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"id", "a", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"id", "y", "2"});
+        expectedTokens.add(new String[]{"op", "MULT", "2"});
+        expectedTokens.add(new String[]{"id", "j", "2"});
+        expectedTokens.add(new String[]{"op", "MULT", "2"});
+        expectedTokens.add(new String[]{"number", "3", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"id", "j", "2"});
+        expectedTokens.add(new String[]{"op", "DIV", "2"});
+        expectedTokens.add(new String[]{"op", "SUB", "2"});
+        expectedTokens.add(new String[]{"id", "u", "2"});
+        expectedTokens.add(new String[]{"op", "MULT", "2"});
+        expectedTokens.add(new String[]{"id", "p", "2"});
         expectedTokens.add(new String[]{"ws", "NEWLINE", "2"});
         expectedTokens.add(new String[]{"EOF", "EOF", "EOF"});
         expectedTokens.add(new String[]{"$", "$", "$"});
@@ -48,9 +70,12 @@ public class LexeurTest {
         assertEquals(expectedTokens.size(), Lexeur.token_stack.size(), "Le nombre de tokens générés n'est pas correct.");
 
         for (int i = 0; i < expectedTokens.size(); i++) {
-            assertEquals(expectedTokens.get(i)[0], Lexeur.token_stack.get(i)[0], "Type de token incorrect pour le token " + i);
-            assertEquals(expectedTokens.get(i)[1], Lexeur.token_stack.get(i)[1], "Valeur de token incorrecte pour le token " + i);
-            assertEquals(expectedTokens.get(i)[2], Lexeur.token_stack.get(i)[2], "Numéro de ligne incorrect pour le token " + i);
+            assertEquals(expectedTokens.get(i)[0], Lexeur.token_stack.get(i)[0], 
+                "Type de token incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[0] + ", Obtenu: " + Lexeur.token_stack.get(i)[0]);
+            assertEquals(expectedTokens.get(i)[1], Lexeur.token_stack.get(i)[1], 
+                "Valeur de token incorrecte pour le token " + i + ". Attendu: " + expectedTokens.get(i)[1] + ", Obtenu: " + Lexeur.token_stack.get(i)[1]);
+            assertEquals(expectedTokens.get(i)[2], Lexeur.token_stack.get(i)[2], 
+                "Numéro de ligne incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[2] + ", Obtenu: " + Lexeur.token_stack.get(i)[2]);
         }
     }
 

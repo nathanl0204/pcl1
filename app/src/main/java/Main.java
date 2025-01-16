@@ -18,10 +18,10 @@ public class Main {
             if (args[0].equals("Parser")){
                 System.out.println("Execution du Parseur\n");
 
-                ParserV2 parserV2 = new ParserV2();
-                parserV2.setTokenQueueFromTokenStack(Lexeur.token_stack);
+                Parser parser = new Parser();
+                parser.setTokenQueueFromTokenStack(Lexeur.token_stack);
                 
-                parserV2.startAnalyse();
+                File result = parser.startAnalyse();
 
                 /* FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
             
