@@ -314,10 +314,8 @@ public class Lexeur {
                                 else {
                                     indentations_stack.remove(ind_stack_len - 1);
                                     String[] item = {"ws", "END", String.valueOf(line_number)};
-                                    String[] last_item = token_stack.get(token_stack.size() - 1);
-                                    token_stack.remove(token_stack.size() - 1);
                                     token_stack.add(item);
-                                    token_stack.add(last_item);
+                                    
                                 }
 
                                 ind_stack_len = indentations_stack.size();
@@ -413,7 +411,7 @@ public class Lexeur {
                 }
             }
 
-            print_tokens(token_stack);
+            //print_tokens(token_stack);
 
             reader.close();
         } catch (IOException e) {

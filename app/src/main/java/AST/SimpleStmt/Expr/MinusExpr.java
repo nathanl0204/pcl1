@@ -12,6 +12,10 @@ public class MinusExpr extends MutExpr {
         this.expr = null;
     }
 
+    public MinusExpr(MinusExpr expr) {
+        this.expr = expr;
+    }
+
     public MinusExpr getMinusExpr() {
         return expr;
     }

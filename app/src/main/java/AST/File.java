@@ -2,6 +2,7 @@ package AST;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,8 +13,8 @@ public class File implements Node{
     private List<Stmt> stmts;
 
     public File(){
-        this.defs = null;
-        this.stmts = null;
+        this.defs = new ArrayList<>();
+        this.stmts = new ArrayList<>();
     }
 
     public File(List<Def> defs,List<Stmt> stmts){
@@ -37,19 +38,31 @@ public class File implements Node{
         stmts.add(stmt);
     }
 
+    public void vizualisation(BufferedWriter writer) throws IOException {
+        vizualisation(writer,"root");
+    }
+
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"File\"];\n");
 
+        String defsNodeName = nodeName + "_defs";
+        writer.write("  " + nodeName + " -- " + defsNodeName + ";\n");
+        writer.write("  " + defsNodeName + " [label=\"DEFS\"];\n");
+        
         for (Def def : defs){
-            String defNodeName = nodeName + "_" + def.hashCode(); 
-            writer.write("  " + nodeName + " -- " + defNodeName + ";\n");
-            def.vizualisation(writer,defNodeName); 
+            String defNodeName = defsNodeName + "_" + def.hashCode(); 
+            writer.write("  " + defsNodeName + " -- " + defNodeName + ";\n");
+            def.vizualisation(writer, defNodeName); 
         }
 
+        String stmtsNodeName = nodeName + "_stmts";
+        writer.write("  " + nodeName + " -- " + stmtsNodeName + ";\n");
+        writer.write("  " + stmtsNodeName + " [label=\"STMTS\"];\n");
+        
         for (Stmt stmt : stmts){
-            String stmtNodeName = nodeName + "_" + stmt.hashCode(); 
-            writer.write("  " + nodeName + " -- " + stmtNodeName + ";\n");
-            stmt.vizualisation(writer,stmtNodeName); 
+            String stmtNodeName = stmtsNodeName + "_" + stmt.hashCode(); 
+            writer.write("  " + stmtsNodeName + " -- " + stmtNodeName + ";\n");
+            stmt.vizualisation(writer, stmtNodeName); 
         }
 
     }
