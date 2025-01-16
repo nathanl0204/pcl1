@@ -7,7 +7,7 @@ f = a // b
 f = a // b
 g = a % b
 if a < b:
-    print("test")
+    print("test") 
 else:
     print("test")
 

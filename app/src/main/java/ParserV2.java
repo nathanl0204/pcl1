@@ -573,7 +573,7 @@ public class ParserV2 {
         if (tokenQueue.isEmpty()) {
             throw new AnalyseException("Erreur : pile de tokens vide !");
         }
-        
+        AnalyseOptNewline();
         Token currentToken = tokenQueue.peek();
 
         if (currentToken.getSymbole().equals("else")){

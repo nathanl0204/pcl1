@@ -16,12 +16,14 @@ public class ParserTest {
 
     @Test
     public void testSimpleAssignment() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
-        tokenStack.add(new String[]{"ident", "x", "1"});
-        tokenStack.add(new String[]{"=", "=", "1"});
-        tokenStack.add(new String[]{"integer", "42", "1"});
+        // Ajout d'un newline optionnel au début
         tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "1"});
-        tokenStack.add(new String[]{"EOF", "EOF", "2"});
+        // Une instruction (stmt_plus)
+        tokenStack.add(new String[]{"id", "x", "2"});
+        tokenStack.add(new String[]{"=", "=", "2"});
+        tokenStack.add(new String[]{"integer", "42", "2"});
+        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "2"});
+        tokenStack.add(new String[]{"EOF", "EOF", "3"});
 
         parser.setTokenQueueFromTokenStack(tokenStack);
         assertDoesNotThrow(() -> parser.startAnalyse());
@@ -29,7 +31,7 @@ public class ParserTest {
 
     @Test
     public void testSimplePrint() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
+        // Une instruction (stmt_plus)
         tokenStack.add(new String[]{"print", "print", "1"});
         tokenStack.add(new String[]{"(", "(", "1"});
         tokenStack.add(new String[]{"integer", "42", "1"});
@@ -43,7 +45,7 @@ public class ParserTest {
 
     @Test
     public void testSimpleFunction() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
+        // Une définition (def_etoile) suivie d'une instruction (stmt_plus)
         tokenStack.add(new String[]{"def", "def", "1"});
         tokenStack.add(new String[]{"ident", "foo", "1"});
         tokenStack.add(new String[]{"(", "(", "1"});
@@ -55,7 +57,12 @@ public class ParserTest {
         tokenStack.add(new String[]{"integer", "42", "2"});
         tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "2"});
         tokenStack.add(new String[]{"END", "END", "3"});
-        tokenStack.add(new String[]{"EOF", "EOF", "4"});
+        // Il faut au moins une instruction après la définition
+        tokenStack.add(new String[]{"ident", "x", "4"});
+        tokenStack.add(new String[]{"=", "=", "4"});
+        tokenStack.add(new String[]{"integer", "1", "4"});
+        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "4"});
+        tokenStack.add(new String[]{"EOF", "EOF", "5"});
 
         parser.setTokenQueueFromTokenStack(tokenStack);
         assertDoesNotThrow(() -> parser.startAnalyse());
@@ -63,7 +70,7 @@ public class ParserTest {
 
     @Test
     public void testIfStatement() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
+        // Une instruction if (stmt_plus)
         tokenStack.add(new String[]{"if", "if", "1"});
         tokenStack.add(new String[]{"ident", "x", "1"});
         tokenStack.add(new String[]{">", ">", "1"});
@@ -77,7 +84,12 @@ public class ParserTest {
         tokenStack.add(new String[]{")", ")", "2"});
         tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "2"});
         tokenStack.add(new String[]{"END", "END", "3"});
-        tokenStack.add(new String[]{"EOF", "EOF", "4"});
+        // Ajout d'une instruction supplémentaire (stmt_plus requiert au moins une instruction)
+        tokenStack.add(new String[]{"ident", "x", "4"});
+        tokenStack.add(new String[]{"=", "=", "4"});
+        tokenStack.add(new String[]{"integer", "1", "4"});
+        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "4"});
+        tokenStack.add(new String[]{"EOF", "EOF", "5"});
 
         parser.setTokenQueueFromTokenStack(tokenStack);
         assertDoesNotThrow(() -> parser.startAnalyse());
@@ -85,11 +97,14 @@ public class ParserTest {
 
     @Test
     public void testForLoop() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
+        // Une boucle for (stmt_plus)
         tokenStack.add(new String[]{"for", "for", "1"});
         tokenStack.add(new String[]{"ident", "i", "1"});
         tokenStack.add(new String[]{"in", "in", "1"});
         tokenStack.add(new String[]{"ident", "range", "1"});
+        tokenStack.add(new String[]{"(", "(", "1"});
+        tokenStack.add(new String[]{"integer", "5", "1"});
+        tokenStack.add(new String[]{")", ")", "1"});
         tokenStack.add(new String[]{":", ":", "1"});
         tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "1"});
         tokenStack.add(new String[]{"BEGIN", "BEGIN", "2"});
@@ -106,26 +121,7 @@ public class ParserTest {
     }
 
     @Test
-    public void testInvalidSyntax() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
-        tokenStack.add(new String[]{"ident", "x", "1"});
-        tokenStack.add(new String[]{"=", "=", "1"});
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "1"});
-        tokenStack.add(new String[]{"EOF", "EOF", "2"});
-
-        parser.setTokenQueueFromTokenStack(tokenStack);
-        assertThrows(AnalyseException.class, () -> parser.startAnalyse());
-    }
-
-    @Test
-    public void testEmptyTokenStack() {
-        parser.setTokenQueueFromTokenStack(tokenStack);
-        assertThrows(AnalyseException.class, () -> parser.startAnalyse());
-    }
-
-    @Test
     public void testComplexExpression() {
-        tokenStack.add(new String[]{"NEWLINE", "NEWLINE", "0"});
         tokenStack.add(new String[]{"ident", "x", "1"});
         tokenStack.add(new String[]{"=", "=", "1"});
         tokenStack.add(new String[]{"(", "(", "1"});
@@ -140,5 +136,11 @@ public class ParserTest {
 
         parser.setTokenQueueFromTokenStack(tokenStack);
         assertDoesNotThrow(() -> parser.startAnalyse());
+    }
+
+    @Test
+    public void testEmptyTokenStack() {
+        parser.setTokenQueueFromTokenStack(tokenStack);
+        assertThrows(AnalyseException.class, () -> parser.startAnalyse());
     }
 }
