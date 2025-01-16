@@ -204,4 +204,12 @@ graph G {
   root_stmts_2093176254_rightExpr -- root_stmts_2093176254_rightExpr_1534030866;
   root_stmts_2093176254_rightExpr_1534030866 [label="5"];
   root_stmts_2093176254 -- root_stmts_2093176254_rightExpr;
+  root_stmts -- root_stmts_664223387;
+  root_stmts_664223387 [label="AFFECT"];
+  root_stmts_664223387_leftExpr [label="b"];
+  root_stmts_664223387 -- root_stmts_664223387_leftExpr;
+  root_stmts_664223387_rightExpr [label="NEG"];
+  root_stmts_664223387_rightExpr -- root_stmts_664223387_rightExpr_824909230;
+  root_stmts_664223387_rightExpr_824909230 [label="a"];
+  root_stmts_664223387 -- root_stmts_664223387_rightExpr;
 }

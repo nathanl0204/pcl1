@@ -28,7 +28,7 @@ public class Parser {
     }
     
     private File AnalyseFile(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -58,7 +58,7 @@ public class Parser {
     }
 
     private void AnalyseOptNewline(){
-        LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("def", "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("def", "ident", "(", "return", "print", "[", "for","if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -132,7 +132,7 @@ public class Parser {
     }
 
     private LinkedList<Def> AnalyseDefEtoile(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -167,7 +167,7 @@ public class Parser {
     }
 
     private LinkedList<Stmt> AnalyseStmtPlus(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -195,7 +195,7 @@ public class Parser {
     }
 
     private LinkedList<Stmt> AnalyseStmtPlusRest(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "-", "integer", "string", "True", "False", "None")) ;
         final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList( "EOF","END")) ;
 
         if (tokenQueue.isEmpty()) {
@@ -281,7 +281,7 @@ public class Parser {
     }
 
     private Suite AnalyseSuite(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -334,7 +334,7 @@ public class Parser {
             throw new ParsingError("Pile de tokens vide !");
         }
         
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         Token currentToken = tokenQueue.peek();
 
@@ -482,7 +482,7 @@ public class Parser {
     }
 
     private Stmt AnalyseStmt(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
     
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -563,7 +563,7 @@ public class Parser {
     }
 
     private Suite AnalyseStmtElse(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -594,7 +594,7 @@ public class Parser {
     }
 
     private Expr AnalyseExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -657,7 +657,7 @@ public class Parser {
     }
 
     private OrExpr AnalyseOrExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -704,7 +704,7 @@ public class Parser {
     }
 
     private AndExpr AnalyseAndExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -751,7 +751,7 @@ public class Parser {
     }
 
     private NotExpr AnalyseNotExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -772,7 +772,7 @@ public class Parser {
     }
 
     private CompExpr AnalyseCompExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -819,7 +819,7 @@ public class Parser {
     }
 
     private AddExpr AnalyseAddExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "-", "integer", "string", "True", "False", "None")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -868,7 +868,7 @@ public class Parser {
     }
 
     private MutExpr AnalyseMutExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -877,14 +877,14 @@ public class Parser {
         Token currentToken = tokenQueue.peek();
         
         if (validetoken.contains(currentToken.getSymbole())){
-            TermExpr termExpr = AnalyseTerminalExpr();
+            MinusExpr minusExpr = AnalyseMinusExpr();
             MutExpr mutExpr = AnalyseMutExprRest();
 
             if (mutExpr == null){
-                return termExpr;
+                return minusExpr;
             }
             else {
-                mutExpr.setLeft(termExpr);
+                mutExpr.setLeft(minusExpr);
                 return mutExpr;
             }
         }
@@ -912,6 +912,30 @@ public class Parser {
         else{
             throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
         }
+    }
+
+
+    private MinusExpr AnalyseMinusExpr(){
+
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            return AnalyseTerminalExpr();
+        }
+        else if(currentToken.getSymbole().equals("-")){
+            tokenQueue.poll();
+            return new MinusExpr(AnalyseMinusExpr());
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
     }
 
     private TermExpr AnalyseTerminalExpr(){
