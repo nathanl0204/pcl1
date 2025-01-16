@@ -20,3 +20,4 @@ resultat = addition(a, b)
 print("Le résultat de l'addition est:")
 print(resultat)
 liste = [1, 2, 3, 4, 5]
+b = -a

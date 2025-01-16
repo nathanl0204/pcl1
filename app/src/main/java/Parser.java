@@ -361,22 +361,21 @@ public class Parser {
             if ( suite == null){
                 return expr;
             }
-            else {
-                if (suite instanceof ExprTab){
-                    ((ExprTab) suite).setLeft(expr);
-                }
-                else if (suite instanceof Affect){
-
-                    if ( ((Affect) suite).getLeft() == null ){ // Cas d'une affectation classique : expr = expr
-                        ((Affect) suite).setLeft(expr);
-                    }
-                    else { // Cas d'une affectation de type tableau : expr ([ expr ])* = expr
-                        ((ExprTab) ((Affect) suite).getLeft()).setLeft(expr);
-                    }
-                    return suite;
-
-                }
+            else if (suite instanceof ExprTab){
+                ((ExprTab) suite).setLeft(expr);
             }
+            else if (suite instanceof Affect){
+
+                if ( ((Affect) suite).getLeft() == null ){ // Cas d'une affectation classique : expr = expr
+                    ((Affect) suite).setLeft(expr);
+                }
+                else { // Cas d'une affectation de type tableau : expr ([ expr ])* = expr
+                    ((ExprTab) ((Affect) suite).getLeft()).setLeft(expr);
+                }
+                return suite;
+
+            }
+            
             throw new ParsingError("PB avec l'affectation dans SimpleStmt");
                 
             
