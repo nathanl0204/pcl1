@@ -21,9 +21,9 @@ public class Main {
                 ParserV2 parserV2 = new ParserV2();
                 parserV2.setTokenQueueFromTokenStack(Lexeur.token_stack);
                 
-                File result = parserV2.startAnalyse();
+                parserV2.startAnalyse();
 
-                FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
+                /* FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
             
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write("graph G {\n");
@@ -33,7 +33,7 @@ public class Main {
 
                 bufferedWriter.write("}\n");
                 bufferedWriter.close();
-                fileWriter.close();
+                fileWriter.close(); */
             }
         }
     }
