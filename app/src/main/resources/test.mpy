@@ -1,5 +1,5 @@
 def i(a,b,c) :
-    return --o+-a-y*j*3-j//u*p
+    return --o+-a-y*j*3-j//-u*p
 a = -10
 b = 20
 c = a + b
@@ -21,4 +21,4 @@ print("Le résultat de l'addition est:")
 print(resultat)
 liste = [1, 2, 3, 4, 5]
 b = ---a
-a[1] = 2
+a = a or b and 2 and not 9 or a + 3
