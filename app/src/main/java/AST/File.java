@@ -38,6 +38,10 @@ public class File implements Node{
         stmts.add(stmt);
     }
 
+    public void vizualisation(BufferedWriter writer) throws IOException {
+        vizualisation(writer,"root");
+    }
+
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"File\"];\n");
 
@@ -45,7 +49,7 @@ public class File implements Node{
         writer.write("  " + nodeName + " -- " + defsNodeName + ";\n");
         writer.write("  " + defsNodeName + " [label=\"DEFS\"];\n");
         
-        for (Def def : defs.reversed()){
+        for (Def def : defs){
             String defNodeName = defsNodeName + "_" + def.hashCode(); 
             writer.write("  " + defsNodeName + " -- " + defNodeName + ";\n");
             def.vizualisation(writer, defNodeName); 
@@ -53,9 +57,9 @@ public class File implements Node{
 
         String stmtsNodeName = nodeName + "_stmts";
         writer.write("  " + nodeName + " -- " + stmtsNodeName + ";\n");
-        writer.write("  " + stmtsNodeName + " [label=\"STMT\"];\n");
+        writer.write("  " + stmtsNodeName + " [label=\"STMTS\"];\n");
         
-        for (Stmt stmt : stmts.reversed()){
+        for (Stmt stmt : stmts){
             String stmtNodeName = stmtsNodeName + "_" + stmt.hashCode(); 
             writer.write("  " + stmtsNodeName + " -- " + stmtNodeName + ";\n");
             stmt.vizualisation(writer, stmtNodeName); 

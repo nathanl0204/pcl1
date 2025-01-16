@@ -47,11 +47,17 @@ public class IdentP extends TermExpr {
             ident.vizualisation(writer,identNodeName); 
         }
 
-        for (Expr expr : exprs){
-            String exprNodeName = nodeName + "_" + expr.hashCode(); 
-            writer.write("  " + nodeName + " -- " + exprNodeName + ";\n");
-            expr.vizualisation(writer,exprNodeName); 
+        if (exprs != null && !exprs.isEmpty()){
+            String paramNodeName = nodeName + "_PARAM";
+            writer.write("  " + nodeName + " -- " + paramNodeName + ";\n");
+            writer.write("  " + paramNodeName + " [label=\"PARAM\"];\n");
+            for (Expr expr : exprs){
+                String exprNodeName = nodeName + "_" + expr.hashCode(); 
+                writer.write("  " + paramNodeName + " -- " + exprNodeName + ";\n");
+                expr.vizualisation(writer,exprNodeName); 
+            }
         }
+        
     }
 
     public TermExpr simplify(){

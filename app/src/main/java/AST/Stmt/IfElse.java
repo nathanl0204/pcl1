@@ -49,7 +49,7 @@ public class IfElse implements Stmt {
     }
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\"IF_THEN\"];\n");
+        writer.write("  " + nodeName + " [label=\"IF_ELSE\"];\n");
 
         if (this.ifExpr != null) {
             String ifNodeName = nodeName + "_if"; 

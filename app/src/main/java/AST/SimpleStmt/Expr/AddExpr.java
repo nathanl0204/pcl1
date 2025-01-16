@@ -85,6 +85,7 @@ public class AddExpr extends CompExpr {
     }
 
     public AddExpr simplify(){
+        leftRotate();
         this.left = left.simplify();
         this.right = right.simplify();
 

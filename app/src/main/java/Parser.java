@@ -1,285 +1,1204 @@
-import GeneralTree.*;
+
+import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.util.Queue;
+
+import AST.*;
+import AST.SimpleStmt.*;
+import AST.SimpleStmt.Expr.*;
+import AST.SimpleStmt.Expr.TermExpr.*;
+import AST.SimpleStmt.Expr.TermExpr.Const.*;
+import AST.Stmt.*;
 
 public class Parser {
-    private ArrayList<String[]> token_stack = new ArrayList<>();
-    private String[] terminals;
-    private String[] non_terminals;
-    Map<String, Map<String, String[]>> ll1_table;
-    private ArrayList<String> errors_stack = new ArrayList<>();
-    private ArrayList<String> grammar_stack = new ArrayList<>();
-    private boolean reading_done;
-    private Tree tree;
-    private GeneralTree complex_AST;
-    
-    public Parser(ArrayList<String[]> token_stack) {
-        this.ll1_table = getLL1table();
-        this.token_stack = token_stack;
-        this.reading_done = false;
-        this.errors_stack = new ArrayList<>();
-        this.grammar_stack = new ArrayList<>();
-        this.grammar_stack.add("$");
-        this.grammar_stack.add("file");
-        this.complex_AST = null;
+    private Queue<Token> tokenQueue;
+
+    public void setTokenQueueFromTokenStack(ArrayList<String[]> stack) {
+        Queue<Token> queue = new LinkedList<Token>();
+        for (int i = 0; i<stack.size(); i++) {
+            String[] previous_token = stack.get(i);
+            queue.add(new Token(previous_token[0], previous_token[1], previous_token[2]));
+        }
+        this.tokenQueue = queue;
     }
 
-    public Map<String, Map<String, String[]>> getLL1table() {
-        Map<String, Map<String, String[]>> table = new HashMap<>();
+    public File startAnalyse(){
+        return AnalyseFile();
+    }
+    
+    private File AnalyseFile(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "integer", "string", "True", "False", "None")) ;
 
-        String[][] rules = {{}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {}, {}, {}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {"opt_newline", "def_etoile", "stmt_plus", "EOF"}, {}, {}, {"NEWLINE"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {"deft", "def_etoile"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {}, {}, {}, {}, {}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {}, {"stmt", "stmt_plus_rest"}, {}, {"stmt", "stmt_plus_rest"}, {}, {"stmt", "stmt_plus_rest"}, {}, {"stmt", "stmt_plus_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {"stmt", "stmt_plus_rest"}, {}, {"ε"}, {}, {}, {"stmt_plus"}, {"stmt_plus"}, {}, {}, {}, {}, {"ε"}, {"stmt_plus"}, {"stmt_plus"}, {}, {"stmt_plus"}, {}, {"stmt_plus"}, {}, {"stmt_plus"}, {}, {"stmt_plus"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"stmt_plus"}, {"stmt_plus"}, {"stmt_plus"}, {"stmt_plus"}, {"stmt_plus"}, {}, {}, {}, {"def", "ident", "(", "ident_etoile_virgule", ")", ":", "suite"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ident_plus_virgule"}, {}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ident", "ident_plus_virgule_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ε"}, {}, {",", "ident_plus_virgule"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"NEWLINE", "BEGIN", "stmt_plus", "END"}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {"or_expr", "simple_stmt_fact"}, {"or_expr", "simple_stmt_fact"}, {}, {}, {}, {}, {}, {"return", "expr"}, {"print", "(", "expr", ")"}, {}, {"or_expr", "simple_stmt_fact"}, {}, {}, {}, {}, {}, {"or_expr", "simple_stmt_fact"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"or_expr", "simple_stmt_fact"}, {"or_expr", "simple_stmt_fact"}, {"or_expr", "simple_stmt_fact"}, {"or_expr", "simple_stmt_fact"}, {"or_expr", "simple_stmt_fact"}, {}, {}, {"simple_stmt_fact_fact"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"simple_stmt_fact_fact"}, {"[", "expr", "]", "expr_crochet_etoile"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"=", "expr"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {"simple_stmt", "NEWLINE"}, {}, {"for", "ident", "in", "expr", ":", "suite"}, {}, {"if", "expr", ":", "suite", "stmt_else"}, {}, {"simple_stmt", "NEWLINE"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {"simple_stmt", "NEWLINE"}, {}, {"ε"}, {}, {}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {}, {"ε"}, {"else", ":", "suite"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"or_expr", "expr_crochet_etoile"}, {"or_expr", "expr_crochet_etoile"}, {}, {}, {}, {}, {}, {}, {}, {}, {"or_expr", "expr_crochet_etoile"}, {}, {}, {}, {}, {}, {"or_expr", "expr_crochet_etoile"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"or_expr", "expr_crochet_etoile"}, {"or_expr", "expr_crochet_etoile"}, {"or_expr", "expr_crochet_etoile"}, {"or_expr", "expr_crochet_etoile"}, {"or_expr", "expr_crochet_etoile"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"[", "expr", "]", "expr_crochet_etoile"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"and_expr", "or_expr_rest"}, {"and_expr", "or_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"and_expr", "or_expr_rest"}, {}, {}, {}, {}, {}, {"and_expr", "or_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"and_expr", "or_expr_rest"}, {"and_expr", "or_expr_rest"}, {"and_expr", "or_expr_rest"}, {"and_expr", "or_expr_rest"}, {"and_expr", "or_expr_rest"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"binop_or", "or_expr"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"not_expr", "and_expr_rest"}, {"not_expr", "and_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"not_expr", "and_expr_rest"}, {}, {}, {}, {}, {}, {"not_expr", "and_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"not_expr", "and_expr_rest"}, {"not_expr", "and_expr_rest"}, {"not_expr", "and_expr_rest"}, {"not_expr", "and_expr_rest"}, {"not_expr", "and_expr_rest"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"binop_and", "and_expr"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"comp_expr"}, {"comp_expr"}, {}, {}, {}, {}, {}, {}, {}, {}, {"comp_expr"}, {}, {}, {}, {}, {}, {"not", "comp_expr"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"comp_expr"}, {"comp_expr"}, {"comp_expr"}, {"comp_expr"}, {"comp_expr"}, {}, {}, {}, {}, {"add_expr", "comp_expr_rest"}, {"add_expr", "comp_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"add_expr", "comp_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"add_expr", "comp_expr_rest"}, {"add_expr", "comp_expr_rest"}, {"add_expr", "comp_expr_rest"}, {"add_expr", "comp_expr_rest"}, {"add_expr", "comp_expr_rest"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"binop_comp", "add_expr"}, {"binop_comp", "add_expr"}, {"binop_comp", "add_expr"}, {"binop_comp", "add_expr"}, {"binop_comp", "add_expr"}, {"binop_comp", "add_expr"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"mut_expr", "add_expr_rest"}, {"mut_expr", "add_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"mut_expr", "add_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"mut_expr", "add_expr_rest"}, {"mut_expr", "add_expr_rest"}, {"mut_expr", "add_expr_rest"}, {"mut_expr", "add_expr_rest"}, {"mut_expr", "add_expr_rest"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"binop_add", "add_expr"}, {"binop_add", "add_expr"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"terminal_expr", "mut_expr_rest"}, {"terminal_expr", "mut_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"terminal_expr", "mut_expr_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"terminal_expr", "mut_expr_rest"}, {"terminal_expr", "mut_expr_rest"}, {"terminal_expr", "mut_expr_rest"}, {"terminal_expr", "mut_expr_rest"}, {"terminal_expr", "mut_expr_rest"}, {}, {}, {"ε"}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"binop_mut", "mut_expr"}, {"binop_mut", "mut_expr"}, {"binop_mut", "mut_expr"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"ident", "expr_rest_ident"}, {"(", "expr", ")"}, {}, {}, {}, {}, {}, {}, {}, {}, {"[", "expr_etoile_virgule", "]"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"const"}, {"const"}, {"const"}, {"const"}, {"const"}, {}, {}, {"ε"}, {}, {}, {"(", "expr_etoile_virgule", ")"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"expr_plus_virgule"}, {"expr_plus_virgule"}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {"expr_plus_virgule"}, {"ε"}, {}, {}, {}, {}, {"expr_plus_virgule"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"expr_plus_virgule"}, {"expr_plus_virgule"}, {"expr_plus_virgule"}, {"expr_plus_virgule"}, {"expr_plus_virgule"}, {}, {}, {}, {}, {"expr", "expr_plus_virgule_rest"}, {"expr", "expr_plus_virgule_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {"expr", "expr_plus_virgule_rest"}, {}, {}, {}, {}, {}, {"expr", "expr_plus_virgule_rest"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"expr", "expr_plus_virgule_rest"}, {"expr", "expr_plus_virgule_rest"}, {"expr", "expr_plus_virgule_rest"}, {"expr", "expr_plus_virgule_rest"}, {"expr", "expr_plus_virgule_rest"}, {}, {}, {}, {}, {}, {}, {"ε"}, {}, {",", "expr_plus_virgule"}, {}, {}, {}, {}, {}, {}, {"ε"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"+"}, {"-"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"*"}, {"//"}, {"%"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"<="}, {">="}, {">"}, {"<"}, {"!="}, {"=="}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"and"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"or"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {"integer"}, {"string"}, {"True"}, {"False"}, {"None"},  {}};
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
 
-        String[] non_terminals = {"file", "opt_newline", "def_etoile", "stmt_plus", "stmt_plus_rest", "deft", "ident_etoile_virgule", "ident_plus_virgule", "ident_plus_virgule_rest", "suite", "simple_stmt", "simple_stmt_fact", "simple_stmt_fact_fact", "stmt", "stmt_else", "expr", "expr_crochet_etoile", "or_expr", "or_expr_rest", "and_expr", "and_expr_rest", "not_expr", "comp_expr", "comp_expr_rest", "add_expr", "add_expr_rest", "mut_expr", "mut_expr_rest", "terminal_expr", "expr_rest_ident", "expr_etoile_virgule", "expr_plus_virgule", "expr_plus_virgule_rest", "binop_add", "binop_mut", "binop_comp", "binop_and", "binop_or", "const"};
-
-        String[] terminals = {"EOF", "NEWLINE", "def", "ident", "(", ")", ":", ",", "BEGIN", "END", "return", "print", "=", "[", "]", "for", "in", "if", "else", "not", "+", "-", "*", "//", "%", "<=", ">=", ">", "<", "!=", "==", "and", "or", "integer", "string", "True", "False", "None", "$"};
-
-        this.non_terminals = non_terminals;
-        this.terminals = terminals;
-
-        int ligns = non_terminals.length;
-        int columns = terminals.length;
-
-        for (int i = 0; i<ligns; i++) {
-            Map<String, String[]> lign = new HashMap<>();
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken.contains(currentToken.getSymbole())){
             
-            table.put(non_terminals[i], lign);
-            for (int j = 0; j<columns; j++) {
-                lign.put(terminals[j], rules[i*columns+j]);
-            }
-        }
 
-        return table;
+            AnalyseOptNewline();
+            
+            File file = new File( AnalyseDefEtoile().reversed() , AnalyseStmtPlus().reversed() );
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("EOF")){
+                System.out.println("MOT RECONNU | AUCUN PROBLEME");
+                return file;
+            }
+
+            
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+        return null;
     }
 
-    public void print_ll1_table() {
-        int ligns = this.ll1_table.size();
-        int columns = this.ll1_table.get("file").size();
+    private void AnalyseOptNewline(){
+        LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("def", "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
 
-        System.out.print("{");
-        for (int i = 0; i<ligns; i++) {
-            System.out.print("{" + this.non_terminals[i] + ":\n");
-            for (int j = 0; j<columns-1; j++) {
-                System.out.print("{" + this.terminals[j] + ":" + Arrays.toString(this.ll1_table.get(this.non_terminals[i]).get(this.terminals[j])) + "}\n");
-            }
-            System.out.print("{" + this.terminals[columns-1] + ":" + Arrays.toString(this.ll1_table.get(this.non_terminals[i]).get(this.terminals[columns-1])) + "}");
-            System.out.print("}\n");
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
         }
-    }
 
-    public String[] getCurrentToken() {
-        return this.token_stack.get(0);
-    }
+        Token currentToken = tokenQueue.peek();
+        if (currentToken.getSymbole().equals("NEWLINE")){
+            tokenQueue.poll();
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
 
-    public Tree getTree() {
-        return this.tree;
-    }
-    
-    public String getConvertedValue(String[] token) {
-        if (token[0].equals("$")) {
-            return "$";
         }
-        if (token[0].equals("id")) {
-            return "ident";
-        }
-        else if (token[0].equals("keyword")) {
-            return token[1];
-        }
-        else if (token[0].equals("number")) {
-            return "integer";
-        }
-        else if (token[0].equals("string")) {
-            return "string";
-        }
-        else if (token[0].equals("op")) {
-            if (token[1].equals("LP")) {
-                return "(";
-            }
-            else if (token[1].equals("RP")) {
-                return ")";
-            }
-            else if (token[1].equals("LB")) {
-                return "[";
-            }
-            else if (token[1].equals("RB")) {
-                return "]";
-            }
-            else if (token[1].equals("MOD")) {
-                return "%";
-            }
-            else if (token[1].equals("DD")) {
-                return ":";
-            }
-            else if (token[1].equals("EQ")) {
-                return "=";
-            }
-            else if (token[1].equals("DIV")) {
-                return "//";
-            }
-            else if (token[1].equals("SUB")) {
-                return "-";
-            }
-            else if (token[1].equals("ADD")) {
-                return "+";
-            }
-            else if (token[1].equals("MULT")) {
-                return "*";
-            }
-            else {
-                return ",";
-            }
-        }
-        else if (token[0].equals("relop")) {
-            if (token[1].equals("LE")) {
-                return "<=";
-            }
-            else if (token[1].equals("GE")) {
-                return ">=";
-            }
-            else if (token[1].equals("LT")) {
-                return "<";
-            }
-            else if (token[1].equals("GT")) {
-                return ">";
-            }
-            else if (token[1].equals("EQ")) {
-                return "==";
-            }
-            else {
-                return "!=";
-            }
-        }
-        else { // case of ws
-            return token[1];
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
         }
     }
 
-    public boolean is_in_array(String[] array, String element) {
-        for (int i = 0; i<array.length; i++) {
-            if (array[i].equals(element)) {
-                return true;
-            }
+    private Def AnalyseDeft(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
         }
-        return false;
-    }
+        
+        Token currentToken = tokenQueue.poll();
 
-    public void remove_unecessary_tokens() {
-        for (int i = 0; i<this.token_stack.size(); i++) {
-            if (this.token_stack.get(i)[0].equals("error") || this.token_stack.get(i)[0].equals("com")) {
-                this.token_stack.remove(i);
-            }
-        }
-    }
+        if (currentToken.getSymbole().equals("def")){
+            Def def = new Def();
 
-    public void get_tokens_to_next_lign(String last_line_creator) {
-        String current_token = getConvertedValue(this.token_stack.get(0));
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("ident")){
+                Ident ident = new Ident(currentToken.getValue());
 
-        while (current_token != "NEWLINE") {
-            this.token_stack.remove(0);
-            current_token = getConvertedValue(this.token_stack.get(0));
-        }
-    }
-
-    public void get_rules_to_previous_line_creator(String last_line_creator) {
-        if (!last_line_creator.equals("NEWLINE")){
-            String current_rule = this.grammar_stack.get(this.grammar_stack.size() - 1);
-            System.out.println(last_line_creator);
-
-            while (!current_rule.equals(last_line_creator)) {
-                System.out.println(current_rule);
-                System.out.println(last_line_creator);
-                this.grammar_stack.remove(this.grammar_stack.size() - 1);
-                current_rule = this.grammar_stack.get(this.grammar_stack.size() - 1);
-            }
-        }
-    }
-    
-    public void top_down_parsing_algorithm() {
-        this.remove_unecessary_tokens();
-
-        LinkedList<GeneralTree> treesList = new LinkedList<>();
-        GeneralTree parsing_tree = new GeneralTree("file");
-        treesList.addLast(parsing_tree);
-        int index_where_add_children = 0;
-
-        while (!this.reading_done) {
-            String X = this.grammar_stack.get(this.grammar_stack.size() - 1);
-            this.grammar_stack.remove(this.grammar_stack.size() - 1);
-
-            String[] a = getCurrentToken();
-
-            //System.out.print(X.toString() + " | " + Arrays.toString(a) + " | ");
-
-            if (is_in_array(this.non_terminals, X)) {
-                String[] current_rule;
-
-                if (X.equals("simple_stmt") && getConvertedValue(a).equals("ident")) {
-                    if (getConvertedValue(this.token_stack.get(1)).equals("=")) {
-                        current_rule = new String[]{"ident", "=", "expr"};
-                    } else {
-                        current_rule = new String[]{"or_expr", "simple_stmt_fact"};
-                    }
-                } else {
-                    current_rule = this.ll1_table.get(X).get(getConvertedValue(a));
-                }
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("(")){
 
 
-                int terminal_length = current_rule.length;
+                    LinkedList<Ident> idents = AnalyseIdentEtoileVirgule();
 
-                if (terminal_length > 0) {
-                    if (!current_rule[0].equals("ε")) {
-                        GeneralTree parent = treesList.get(index_where_add_children);
-                        for (int i = 0; i<terminal_length; i++) {
-                            String node = current_rule[terminal_length - 1 - i];
-                            this.grammar_stack.add(node);
-                            GeneralTree child = new GeneralTree(node);
-                            parent.addChild(child);
-                            treesList.addLast(child);
+                    currentToken = tokenQueue.poll();
+                    if(currentToken.getSymbole().equals(")")){
+                        
+                        currentToken = tokenQueue.poll();
+                        if(currentToken.getSymbole().equals(":")){
+                            def.setIdent(ident);
+                            def.setIdents(idents.reversed());
+                            def.setSuite( AnalyseSuite() );
+
+                            return def;
                         }
-                        treesList.removeFirst();
-    
-                       // System.out.println(X.toString() + " -> " + Arrays.toString(current_rule));
-                    }
-                    else {
-                        treesList.removeFirst();
+                        else{
+                            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                        }
 
-                        // System.out.println("On ne fait rien (epsilon)");
+                    }
+                    else{
+                        throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
                     }
                 }
-                else {                 
-                    treesList.removeFirst();
-                    this.errors_stack.add("Expression invalide ligne " + a[2].toString());
-                    // System.out.println("On skip ce non terminal: " + X.toString());
+                else{
+                    throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
                 }
             }
-            else {
-                if (X.equals("$")) {
-                    if (!getConvertedValue(a).equals("$")) {
-                        this.errors_stack.add("Le token " + getConvertedValue(a).toString() + "est de trop (ligne" + a[2].toString() + ")");
-                    }
-                    this.reading_done = true;
-                }
-                else if (!X.equals(getConvertedValue(a))) {
-                    treesList.removeFirst();
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+            
 
-                    this.errors_stack.add(getConvertedValue(a).toString() + ": ce caractère n'est pas attendu à la ligne" + a[2].toString());
-                    //System.out.println("On skip ce token: " + X.toString());
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Def> AnalyseDefEtoile(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("def")){
+            Def def = AnalyseDeft();
+            LinkedList<Def> defs = AnalyseDefEtoile();
+
+            if (defs == null) {
+                LinkedList<Def> newDefs = new LinkedList<Def>();
+                newDefs.add(def);
+                
+                return newDefs;
+            }
+            else {
+                defs.add(def);
+                return defs;
+            }
+
+
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
+            return new LinkedList<>();
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+        
+    }
+
+    private LinkedList<Stmt> AnalyseStmtPlus(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            Stmt stmt = AnalyseStmt();
+            LinkedList<Stmt> stmts = AnalyseStmtPlusRest();
+
+            if (stmts == null){
+                LinkedList<Stmt> newStmts = new LinkedList<Stmt>();
+                newStmts.add(stmt);
+                return newStmts;
+            }
+            else {
+                stmts.add(stmt);
+                return stmts;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Stmt> AnalyseStmtPlusRest(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList( "EOF","END")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken.contains(currentToken.getSymbole())){
+            return AnalyseStmtPlus();
+        }
+        else if (validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }   
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Ident> AnalyseIdentEtoileVirgule(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            return AnalyseIdentPlusVirgule();
+        }
+        else if (currentToken.getSymbole().equals(")")){
+            return null;
+        }
+        else {
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private LinkedList<Ident> AnalyseIdentPlusVirgule(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            tokenQueue.poll();
+            Ident ident = new Ident(currentToken.getValue());
+            LinkedList<Ident> idents = AnalyseIdentPlusVirguleRest();
+
+            if (idents == null){
+                LinkedList<Ident> newIdents = new LinkedList<>();
+                newIdents.add(ident);
+                return newIdents;
+            }
+            else {
+                idents.add(ident);
+                return idents;
+            }
+        }
+        else {
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Ident> AnalyseIdentPlusVirguleRest(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals(")")){
+            return null;
+        }
+        else if (currentToken.getSymbole().equals(",")){
+            tokenQueue.poll();
+            return AnalyseIdentPlusVirgule();
+        }
+        else {
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private Suite AnalyseSuite(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "return", "print", "[", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (currentToken.getSymbole().equals("NEWLINE")){
+            tokenQueue.poll();
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("BEGIN")){
+
+                Suite suite = new Suite( AnalyseStmtPlus() ); 
+
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("END")){
+                    return suite;
+                }
+                else{
+                    throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                }
+
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+
+        else if (validetoken.contains(currentToken.getSymbole())){
+
+
+            SimpleStmt simpleStmt = AnalyseSimpleStmt();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("NEWLINE")){
+                return new Suite( Arrays.asList(simpleStmt) );
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private SimpleStmt AnalyseSimpleStmt(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident")){
+            tokenQueue.poll();
+            
+            Ident ident = new Ident(currentToken.getValue());
+
+            currentToken = tokenQueue.poll();
+            if (currentToken.getSymbole().equals("=")){
+                return new Affect( ident , AnalyseExpr() );
+            }
+            else {
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+
+
+        else if(validetoken.contains(currentToken.getSymbole())){
+
+            Expr expr = AnalyseOrExpr();
+            SimpleStmt suite = AnalyseSimpleStmtFact();
+
+            if ( suite == null){
+                return expr;
+            }
+            else {
+                if (suite instanceof ExprTab){
+                    ((ExprTab) suite).setLeft(expr);
+                }
+                else if (suite instanceof Affect){
+
+                    if ( ((Affect) suite).getLeft() == null ){ // Cas d'une affectation classique : expr = expr
+                        ((Affect) suite).setLeft(expr);
+                    }
+                    else { // Cas d'une affectation de type tableau : expr ([ expr ])* = expr
+                        ((ExprTab) ((Affect) suite).getLeft()).setLeft(expr);
+                    }
+                    return suite;
+
+                }
+            }
+            throw new ParsingError("PB avec l'affectation dans SimpleStmt");
+                
+            
+            
+        }
+        else if(currentToken.getSymbole().equals("return")){
+            
+            tokenQueue.poll();
+            return new Return(AnalyseExpr());
+            
+        }
+        else if(currentToken.getSymbole().equals("print")){
+            tokenQueue.poll();
+            currentToken = tokenQueue.poll();
+
+            if(currentToken.getSymbole().equals("(")){
+                
+                Print print = new Print(AnalyseExpr());
+
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals(")")){
+                    return print;
+                }
+                else{
+                    throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                }
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+            
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private SimpleStmt AnalyseSimpleStmtFact(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "NEWLINE","=")) ;
+
+        Token currentToken = tokenQueue.peek();
+
+        if(validetoken.contains(currentToken.getSymbole())){
+            Expr expr = AnalyseSimpleStmtFactFact();
+
+            if (expr != null){
+                return new Affect(expr);
+            }
+            return null;
+        }
+        else if(currentToken.getSymbole().equals("[")){
+
+            Expr expr = AnalyseExpr();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+
+                if (exprs == null){
+                    exprs = new LinkedList<>();
+                }
+                exprs.addFirst(expr);
+                ExprTab exprTab = new ExprTab(exprs);
+
+
+                Expr rightExpr = AnalyseSimpleStmtFactFact();
+                if (rightExpr == null){
+                    return exprTab;
                 }
                 else {
-                    treesList.removeFirst();
-
-                    this.token_stack.remove(0);
-                    //System.out.println("On écrit le token: " + Arrays.toString(a));
+                    return new Affect(exprTab,rightExpr);
                 }
             }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
         }
-        this.complex_AST = parsing_tree;
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
     }
 
-    public void printComplexAST() {
-        this.complex_AST.printTreeDot();
+    private Expr AnalyseSimpleStmtFactFact(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        if (currentToken.getSymbole().equals("=")){
+            tokenQueue.poll();
+            return AnalyseExpr();
+        }
+        else if (currentToken.getSymbole().equals("NEWLINE")){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private Stmt AnalyseStmt(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(","return","print", "[", "not", "integer", "string", "True", "False", "None")) ;
+    
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+
+            SimpleStmt simpleStmt = AnalyseSimpleStmt();
+
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("NEWLINE")){
+                return simpleStmt;
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+            
+        }
+        else if (currentToken.getSymbole().equals("for")){
+            tokenQueue.poll();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("ident")){
+                
+                Ident ident = new Ident(currentToken.getValue());
+                currentToken = tokenQueue.poll();
+                if(currentToken.getSymbole().equals("in")){
+
+                    Expr expr = AnalyseExpr();
+
+                    currentToken = tokenQueue.poll();
+                    if(currentToken.getSymbole().equals(":")){
+                        
+                        return new For( ident,expr, AnalyseSuite());
+
+                    }
+                    else{
+                        throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                    }
+                }
+                else{
+                    throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                }
+                
+            }
+            else{
+                 throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if (currentToken.getSymbole().equals("if")){
+            tokenQueue.poll();
+
+            Expr expr = AnalyseExpr();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(":")){
+                
+                Suite suite = AnalyseSuite();
+                Suite elseSuite = AnalyseStmtElse();
+
+                if (elseSuite == null){
+                    return new If(expr,suite);
+                }
+                else return new IfElse(expr,suite,elseSuite);
+                
+            }
+            else{
+                 throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private Suite AnalyseStmtElse(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "EOF","ident", "(","END", "return", "print", "[", "for","if", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("else")){
+            tokenQueue.poll();
+
+            currentToken = tokenQueue.poll();
+
+            if (currentToken.getSymbole().equals(":")){
+                
+                return AnalyseSuite();
+            }
+            else{
+                throw new ParsingError("Line t: " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private Expr AnalyseExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            OrExpr orExpr = AnalyseOrExpr();
+            LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+
+            if (exprs == null){
+                return orExpr;
+            }
+            else {
+                return new ExprTab(orExpr, exprs);
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Expr> AnalyseExprCrochetEtoile(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("[")){
+            tokenQueue.poll();
+            Expr expr = AnalyseExpr();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+                if (exprs == null) {
+                    LinkedList<Expr> newExprs = new LinkedList<>();
+                    newExprs.addFirst(expr);
+                    return newExprs;
+                }
+                else {
+                    exprs.addFirst(expr);
+                    return exprs;
+                }
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private OrExpr AnalyseOrExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            AndExpr andExpr = AnalyseAndExpr();
+            OrExpr orExpr = AnalyseOrExprRest();
+
+            if (orExpr == null){
+                return andExpr;
+            }
+            else {
+                orExpr.addOrExpr(andExpr);
+                return orExpr;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private OrExpr AnalyseOrExprRest(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","[","]")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("or")){
+            AnalyseBinopOr();
+            return AnalyseOrExpr();
+        }
+        else if(validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private AndExpr AnalyseAndExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            NotExpr notExpr = AnalyseNotExpr();
+            AndExpr andExpr = AnalyseAndExprRest();
+
+            if (andExpr == null){
+                return notExpr;
+            }
+            else {
+                andExpr.addOrExpr(notExpr);
+                return andExpr;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private AndExpr AnalyseAndExprRest(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("or","NEWLINE",")",":",",","=","[","]")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("and")){
+            AnalyseBinopAnd();
+            return AnalyseAndExpr();
+        }
+        else if(validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private NotExpr AnalyseNotExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            return AnalyseCompExpr();
+        }
+        else if(currentToken.getSymbole().equals("not")){
+            tokenQueue.poll();
+            return new NotExpr(AnalyseNotExpr());
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private CompExpr AnalyseCompExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            AddExpr addExpr = AnalyseAddExpr();
+            CompExpr compExpr = AnalyseCompExprRest();
+
+            if (compExpr == null){
+                return addExpr;
+            }
+            else {
+                compExpr.setLeft(addExpr);
+                return compExpr;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private CompExpr AnalyseCompExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken2.contains(currentToken.getSymbole())){
+            return new CompExpr( AnalyseBinopComp() , AnalyseAddExpr());
+        }
+        else if(validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private AddExpr AnalyseAddExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken.contains(currentToken.getSymbole())){
+            MutExpr mutExpr = AnalyseMutExpr();
+            AddExpr addExpr = AnalyseAddExprRest();
+
+            if (addExpr == null){
+                return mutExpr;
+            }
+            else {
+                addExpr.setLeft(mutExpr);
+                return addExpr;
+            }
+
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private AddExpr AnalyseAddExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("-","+")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken2.contains(currentToken.getSymbole())){
+            return new AddExpr( AnalyseBinopAdd(), AnalyseAddExpr());
+        }
+        else if(validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private MutExpr AnalyseMutExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+        
+        if (validetoken.contains(currentToken.getSymbole())){
+            TermExpr termExpr = AnalyseTerminalExpr();
+            MutExpr mutExpr = AnalyseMutExprRest();
+
+            if (mutExpr == null){
+                return termExpr;
+            }
+            else {
+                mutExpr.setLeft(termExpr);
+                return mutExpr;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private MutExpr AnalyseMutExprRest(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-")) ;
+        final LinkedList<String> validetoken2 = new LinkedList<>(Arrays.asList("*","//","%")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken2.contains(currentToken.getSymbole())){
+            return new MutExpr( AnalyseBinopMut(),AnalyseMutExpr());
+        }
+        else if(validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private TermExpr AnalyseTerminalExpr(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        
+        Token currentToken = tokenQueue.peek();
+        if (currentToken.getSymbole().equals("ident")){
+            tokenQueue.poll();
+
+            Ident ident = new Ident(currentToken.getValue());
+            LinkedList<Expr> exprs = AnalyseExprRestIdent();
+
+            if (exprs == null){
+                return ident;
+            }
+            else return new IdentP(ident, exprs);
+        }
+        else if(currentToken.getSymbole().equals("(")){
+            tokenQueue.poll();
+
+            Expr expr = AnalyseExpr();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(")")){
+                return new Parenthese(expr);
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if(currentToken.getSymbole().equals("[")){
+            tokenQueue.poll();
+            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+
+                return new ListType(exprs);
+            }
+            else{
+
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if(validetoken.contains(currentToken.getSymbole())){
+            return AnalyseConst();
+        }
+        else{
+            throw new ParsingError("Line : " +  currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Expr> AnalyseExprRestIdent(){
+        final LinkedList<String> validetoken1 = new LinkedList<>(Arrays.asList("and","or","NEWLINE",")",":",",","=","[","]","<=",">=",">","<","!=","==","+","-","*","//","%")) ;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("(")){
+            tokenQueue.poll();
+
+            LinkedList<Expr> exprs = AnalyseExprEtoileVirgule();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals(")")){
+                return exprs;
+            }
+            else{
+                 throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if(validetoken1.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Expr> AnalyseExprEtoileVirgule(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "not", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken2 = new ArrayList<>(Arrays.asList(")","]"));
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            return AnalyseExprPlusVirgule();
+        }
+        else if (validetoken2.contains(currentToken.getSymbole())){
+            return null;
+        } 
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Expr> AnalyseExprPlusVirgule(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident","(","[","not", "integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            Expr expr = AnalyseExpr();
+            LinkedList<Expr> exprs = AnalyseExprPlusVirguleRest();
+
+            if (exprs == null){
+                LinkedList<Expr> newExprs = new LinkedList<>();
+                newExprs.add(expr);
+                return newExprs;
+            }
+            else {
+                exprs.addFirst(expr);
+                return exprs;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private LinkedList<Expr> AnalyseExprPlusVirguleRest(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals(",")){
+            tokenQueue.poll();
+            return AnalyseExprPlusVirgule();
+        }
+        else if(currentToken.getSymbole().equals(")") || currentToken.getSymbole().equals("]")){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private AddBinop AnalyseBinopAdd(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+
+        if (currentToken.getSymbole().equals("+")){
+            return AddBinop.ADD;
+        }
+        else if (currentToken.getSymbole().equals("-")){
+            return AddBinop.SUB;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private MutBinop AnalyseBinopMut(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+
+        if (currentToken.getSymbole().equals("*")){
+            return MutBinop.MULT;
+        }
+        else if (currentToken.getSymbole().equals("//")){
+            return MutBinop.DIV;
+        }
+        else if (currentToken.getSymbole().equals("%")){
+            return MutBinop.MOD;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private CompBinop AnalyseBinopComp(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("<=",">=",">","<","!=","==")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+
+        if (validetoken.contains(currentToken.getSymbole())){
+            switch (currentToken.getSymbole()) {
+                case "<" :
+                    return CompBinop.LESS_THAN;
+                case "<=" :
+                    return CompBinop.LESS_EQUAL;
+                case ">" :
+                    return CompBinop.GREATER_THAN;
+                case ">=" :
+                    return CompBinop.GREATER_EQUAL;
+                case "==" :
+                    return CompBinop.EQUAL;
+                case "!=" :
+                    return CompBinop.NOT_EQUAL;
+                default:
+                    return null;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+    }
+
+    private void AnalyseBinopAnd(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+
+        if (currentToken.getSymbole().equals("and")){
+            return;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private void AnalyseBinopOr(){
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+
+        if (currentToken.getSymbole().equals("or")){
+            return;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
+    }
+
+    private Const AnalyseConst(){
+        final LinkedList<String> validetoken = new LinkedList<>(Arrays.asList("integer", "string", "True", "False", "None")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.poll();
+        
+    
+        if (validetoken.contains(currentToken.getSymbole())){
+            switch (currentToken.getSymbole()) {
+                case "integer" :
+                    return new IntegerType(Integer.valueOf(currentToken.getValue()));
+                case "string" :
+                    return new StringType(currentToken.getValue());
+                case "True" :
+                    return new BoolType(true);
+                case "False" :
+                    return new BoolType(false);
+                /*case "None" :
+                    return new NoneType();*/
+                default:
+                    return null;
+            }
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
+
     }
 }
-

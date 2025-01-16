@@ -48,19 +48,25 @@ public class Def implements Node {
         if (this.ident != null) {
             String identNodeName = nodeName + "_ident"; 
             writer.write("  " + nodeName + " -- " + identNodeName + ";\n");
-            ((Node) this.ident).vizualisation(writer, identNodeName);
+            ident.vizualisation(writer, identNodeName);
         }
 
-        for (Ident ident_ : idents){
-            String childNodeName = nodeName + "_" + ident_.hashCode(); 
-            writer.write("  " + nodeName + " -- " + childNodeName + ";\n");
-            ((Node) ident_).vizualisation(writer,childNodeName); 
+
+        if (idents != null && !idents.isEmpty()){
+            String paramNodeName = nodeName + "_PARAM";
+            writer.write("  " + nodeName + " -- " + paramNodeName + ";\n");
+            writer.write("  " + paramNodeName + " [label=\"PARAM\"];\n");
+            for (Ident ident_ : idents){
+                String childNodeName = paramNodeName + "_" + ident_.hashCode(); 
+                writer.write("  " + paramNodeName + " -- " + childNodeName + ";\n");
+                ident_.vizualisation(writer,childNodeName); 
+            }
         }
 
         if (this.suite != null) {
             String suiteNodeName = nodeName + "_suite"; 
             writer.write("  " + nodeName + " -- " + suiteNodeName + ";\n");
-            ((Node) this.suite).vizualisation(writer, suiteNodeName); 
+            suite.vizualisation(writer, suiteNodeName); 
         }
     }
 

@@ -64,6 +64,7 @@ public class MutExpr extends AddExpr {
     }
 
     public MutExpr simplify(){
+        leftRotate();
         this.left = left.simplify();
         this.right = right.simplify();
 
