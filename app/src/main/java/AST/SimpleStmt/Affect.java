@@ -59,6 +59,7 @@ public class Affect implements SimpleStmt {
 
     public Affect simplify(){
         rightExpr = rightExpr.simplify();
+        leftExpr = leftExpr.simplify();
         return this;
     }
 }

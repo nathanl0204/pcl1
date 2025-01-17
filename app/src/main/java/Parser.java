@@ -336,35 +336,32 @@ public class Parser {
         
         final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[", "not", "-", "integer", "string", "True", "False", "None")) ;
 
-        Token currentToken = tokenQueue.peek();
 
-        if (currentToken.getSymbole().equals("ident")){
+
+        Token currentToken = tokenQueue.poll();
+        Token LL2Token = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("ident") && LL2Token.getSymbole().equals("=")){
             tokenQueue.poll();
-            
             Ident ident = new Ident(currentToken.getValue());
-
-            currentToken = tokenQueue.poll();
-            if (currentToken.getSymbole().equals("=")){
-                Expr expr = AnalyseExpr();
-                return new Affect( ident , expr );
-            }
-            else {
-                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
-            }
+            Expr expr = AnalyseExpr();
+            return new Affect( ident , expr );
         }
 
+        ((LinkedList<Token>) tokenQueue).addFirst(currentToken);
 
-        else if(validetoken.contains(currentToken.getSymbole())){
+        System.out.println(currentToken == tokenQueue.peek());
+        System.out.println(currentToken.getSymbole());
+
+        if(validetoken.contains(currentToken.getSymbole())){
 
             Expr expr = AnalyseOrExpr();
             SimpleStmt suite = AnalyseSimpleStmtFact();
 
-            if ( suite == null){
+            if ( suite == null)
                 return expr;
-            }
-            else if (suite instanceof ExprTab){
+            else if (suite instanceof ExprTab)
                 ((ExprTab) suite).setLeft(expr);
-            }
             else if (suite instanceof Affect){
 
                 if ( ((Affect) suite).getLeft() == null ){ // Cas d'une affectation classique : expr = expr
@@ -373,14 +370,9 @@ public class Parser {
                 else { // Cas d'une affectation de type tableau : expr ([ expr ])* = expr
                     ((ExprTab) ((Affect) suite).getLeft()).setLeft(expr);
                 }
-                return suite;
-
-            }
-            
-            throw new ParsingError("PB avec l'affectation dans SimpleStmt");
                 
-            
-            
+            }
+            return suite;
         }
         else if(currentToken.getSymbole().equals("return")){
             
@@ -412,7 +404,6 @@ public class Parser {
         else{
             throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
         }
-
     }
 
     private SimpleStmt AnalyseSimpleStmtFact(){
@@ -433,13 +424,14 @@ public class Parser {
             return null;
         }
         else if(currentToken.getSymbole().equals("[")){
-
+            tokenQueue.poll();
+            
             Expr expr = AnalyseExpr();
 
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("]")){
                 LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
-
+                
                 if (exprs == null){
                     exprs = new LinkedList<>();
                 }
@@ -608,8 +600,6 @@ public class Parser {
             LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
 
             if (exprs == null){
-                System.out.println("1");
-                System.out.println(orExpr.getClass());
                 return orExpr;
             }
             else {
@@ -622,7 +612,7 @@ public class Parser {
     }
 
     private LinkedList<Expr> AnalyseExprCrochetEtoile(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",", "ident", "(", "]")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=", "]")) ;
         
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -673,13 +663,11 @@ public class Parser {
             OrExpr orExpr = AnalyseOrExprRest();
 
             if (orExpr == null){
-                System.out.println("passe par la ");
                 OrExpr orExpr_ = new OrExpr();
                 orExpr_.addOrExpr(andExpr);
                 return orExpr_;
             }
             else {
-                System.out.println("passe par ici ");
                 orExpr.addOrExpr(andExpr);
                 return orExpr;
             }
@@ -962,10 +950,10 @@ public class Parser {
             Ident ident = new Ident(currentToken.getValue());
             LinkedList<Expr> exprs = AnalyseExprRestIdent();
 
-            if (exprs == null){
-                return ident;
-            }
-            else return new IdentP(ident, exprs);
+            if (exprs == null)
+                return new IdentP(ident, new ArrayList<Expr>());
+            else 
+                return new IdentP(ident, exprs);
         }
         else if(currentToken.getSymbole().equals("(")){
             tokenQueue.poll();

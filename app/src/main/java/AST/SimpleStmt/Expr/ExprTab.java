@@ -23,13 +23,26 @@ public class ExprTab implements Expr {
         this.expr = expr;
     }
 
-    @Override
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'vizualisation'");
+        writer.write("  " + nodeName + " [label=\"TAB_ACCES\"];\n");
+    
+        if (expr != null) {
+            String leftNodeName = nodeName + "_left";
+            writer.write("  " + nodeName + " -- " + leftNodeName + ";\n");
+            expr.vizualisation(writer, leftNodeName); 
+        }
+    
+        String indexNodeName = nodeName + "_INDEX";
+        writer.write("  " + indexNodeName + " [label=\"INDEX\"];\n");
+        writer.write("  " + nodeName + " -- " + indexNodeName + ";\n");
+    
+        for (int i = 0; i < exprs.size(); i++) {
+            String childNodeName = indexNodeName + "_child" + i;
+            writer.write("  " + indexNodeName + " -- " + childNodeName + ";\n");
+            exprs.get(i).vizualisation(writer, childNodeName);  
+        }
     }
-
-    @Override
+    
     public ExprTab simplify() {
         expr = expr.simplify();
         exprs = exprs.stream()

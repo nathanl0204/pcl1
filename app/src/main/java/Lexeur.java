@@ -348,7 +348,7 @@ public class Lexeur {
                 System.out.print(",");
             }
         }
-        System.out.print("]");
+        System.out.print("] \n\n");
     }
 
     public static boolean is_in(String element, String[] array) {
