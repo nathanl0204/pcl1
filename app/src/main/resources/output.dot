@@ -1,4 +1,4 @@
-graph G {
+graph AST {
   root [label="File"];
   root -- root_defs;
   root_defs [label="DEFS"];
