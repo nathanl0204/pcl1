@@ -3,7 +3,7 @@ def selection_sort(lst):
     for i in range(n):
         min_index = i
         for j in range(i + 1, n):
-            if a + b[2][1]:
+            if lst[j] < lst[min_index]:
                 min_index = j
         tmp = lst[i]
         lst[i] = lst[min_index]
@@ -14,4 +14,3 @@ print(my_list)
 selection_sort(my_list)
 print("Après le tri par sélection :")
 print(my_list)
-[[1,2,3],[4,5,6]]

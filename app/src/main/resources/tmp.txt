@@ -29,8 +29,6 @@ simple_stmt -> expr simple_stmt_fact .
 simple_stmt_fact -> .  
 simple_stmt_fact -> "=" expr . 
 
-
-
 stmt -> simple_stmt NEWLINE . 
 stmt -> for ident in expr ":" suite . 
 stmt -> if expr ":" suite stmt_else . 

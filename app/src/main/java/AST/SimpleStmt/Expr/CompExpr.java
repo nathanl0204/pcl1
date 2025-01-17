@@ -50,8 +50,7 @@ public class CompExpr extends NotExpr {
     
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
-        writer.write("  " + nodeName + " [label=\"" + this.symbole.name() + "\"];\n");
-
+        writer.write("  " + nodeName + " [label=\"" + this.symbole.toString() + "\"];\n");
         
         if (this.left != null) {
             String leftNodeName = nodeName + "_left"; 

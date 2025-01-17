@@ -1,5 +1,60 @@
 def i(a,b,c) :
     return --o+-a-y*j*3-j//-u*p
+def add(a,b):return a+b
+def multiply(a,b):return a*b
+x=10
+y=20
+z=add(x,y)
+if x<y:print("x is smaller")
+else:print("x is not smaller")
+for i in range(5):print(i)
+a=[1,2,3]
+b=a[1]+a[2]
+a[0]=b
+x=5
+y=3
+z=--x+y*2-4//2
+if x==5:print("X is 5")
+else :
+    if y>x:print("Y is greater than X")
+    else:print("Neither condition is true")
+for i in range(10):
+ if i%2==0:print(i)
+result=--x*y//z+x%y
+print(result)
+a=[10,20,30]
+b=a[0]+a[1]
+a[2]=b
+f=3
+g=f*2+1
+h=g//f
+if f>g:print("F is greater than G")
+else :
+    if h==f:print("H is equal to F")
+    else:print("No condition matched")
+i=7
+j=3
+k=--i+j*2
+m=-x
+n=m+y
+a=[1,2,3]
+b=a[1]+a[2]
+a[1]=b
+result=multiply(x,y)
+print(result)
+if x!=y:print("X and Y are not equal")
+result=(x+y)*(z-1)//2
+print(result)
+list_of_numbers=[1,2,3,4,5]
+index=2
+result=list_of_numbers[index]*2
+print(result)
+a=[10,20,30]
+b=a[0]*2+a[1]
+a[2]=b
+a[0][1]=100
+a[1]=b+5
+--x+y//3
 a = -10
 b = 20
 c = a + b
@@ -23,7 +78,6 @@ liste = [1, 2, 3, 4, 5]
 b = ---a
 a[1][1] = 2
 a[1] > a[2][1]
-a or b
+a or b + 3 and 4 or not 1 or 15 and 400 >= e + r//2 and not 400
 a[1] = 2
 a = 2
-2 = 5
