@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class NoneTypeTest {
 
-    /*@Test
+    @Test
     public void testSimplify() {
         NoneType noneType = new NoneType();
         assertSame(noneType, noneType.simplify());
-    }*/
+    }
 }

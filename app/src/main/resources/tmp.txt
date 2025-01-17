@@ -24,15 +24,13 @@ suite -> NEWLINE BEGIN stmt_plus END .
  
 simple_stmt -> return expr . 
 simple_stmt -> print "(" expr ")" . 
-simple_stmt -> ident "=" expr . 
- 
-simple_stmt -> or_expr simple_stmt_fact . 
+simple_stmt -> expr simple_stmt_fact .
  
 simple_stmt_fact -> .  
-simple_stmt_fact -> "[" expr "]" expr_crochet_etoile                      
-   simple_stmt_fact_fact .  
-simple_stmt_fact_fact -> .  
-simple_stmt_fact_fact -> "=" expr . 
+simple_stmt_fact -> "=" expr . 
+
+
+
 stmt -> simple_stmt NEWLINE . 
 stmt -> for ident in expr ":" suite . 
 stmt -> if expr ":" suite stmt_else . 

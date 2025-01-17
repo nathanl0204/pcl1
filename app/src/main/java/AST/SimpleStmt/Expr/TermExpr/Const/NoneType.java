@@ -3,7 +3,7 @@ package AST.SimpleStmt.Expr.TermExpr.Const;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-class NoneType extends Const {
+public class NoneType extends Const {
 
     public NoneType(){}
 
