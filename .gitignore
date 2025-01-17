@@ -1,10 +1,6 @@
 build/
 # Ignore Gradle project-specific cache directory
 .gradle
-<<<<<<< HEAD
-=======
-.vscode/
->>>>>>> origin/AST
-
+.vscode
 # Ignore Gradle build output directory
 build
