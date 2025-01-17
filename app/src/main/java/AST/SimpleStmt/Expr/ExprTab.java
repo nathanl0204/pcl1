@@ -5,9 +5,14 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ExprTab implements Expr {
+public class ExprTab extends MinusExpr {
     private Expr expr;
     private List<Expr> exprs;
+
+    public ExprTab(){
+        this.expr = null;
+        this.exprs = null;
+    }
 
     public ExprTab(Expr expr, List<Expr> exprs){
         this.expr = expr;

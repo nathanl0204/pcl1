@@ -28,7 +28,7 @@ public class Parser {
     }
     
     private File AnalyseFile(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "in", "if", "not", "-", "integer", "string", "True", "False", "None")) ;
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE", "def", "ident", "(", "return", "print", "[", "for", "if", "not", "-", "integer", "string", "True", "False", "None")) ;
 
         if (tokenQueue.isEmpty()) {
             throw new ParsingError("Pile de tokens vide !");
@@ -294,7 +294,7 @@ public class Parser {
             currentToken = tokenQueue.poll();
             if(currentToken.getSymbole().equals("BEGIN")){
 
-                Suite suite = new Suite( AnalyseStmtPlus() ); 
+                Suite suite = new Suite( AnalyseStmtPlus().reversed() ); 
 
                 currentToken = tokenQueue.poll();
                 if(currentToken.getSymbole().equals("END")){
@@ -349,9 +349,6 @@ public class Parser {
         }
 
         ((LinkedList<Token>) tokenQueue).addFirst(currentToken);
-
-        System.out.println(currentToken == tokenQueue.peek());
-        System.out.println(currentToken.getSymbole());
 
         if(validetoken.contains(currentToken.getSymbole())){
 
@@ -587,66 +584,7 @@ public class Parser {
     }
 
     private Expr AnalyseExpr(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList( "ident", "(", "[",  "not", "-", "integer", "string", "True", "False", "None")) ;
-
-        if (tokenQueue.isEmpty()) {
-            throw new ParsingError("Pile de tokens vide !");
-        }
-        
-        Token currentToken = tokenQueue.peek();
-
-        if (validetoken.contains(currentToken.getSymbole())){
-            OrExpr orExpr = AnalyseOrExpr();
-            LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
-
-            if (exprs == null){
-                return orExpr;
-            }
-            else {
-                return new ExprTab(orExpr, exprs);
-            }
-        }
-        else{
-            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
-        }
-    }
-
-    private LinkedList<Expr> AnalyseExprCrochetEtoile(){
-        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=", "]")) ;
-        
-        if (tokenQueue.isEmpty()) {
-            throw new ParsingError("Pile de tokens vide !");
-        }
-        
-        Token currentToken = tokenQueue.peek();
-
-        if (currentToken.getSymbole().equals("[")){
-            tokenQueue.poll();
-            Expr expr = AnalyseExpr();
-
-            currentToken = tokenQueue.poll();
-            if(currentToken.getSymbole().equals("]")){
-                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
-                if (exprs == null) {
-                    LinkedList<Expr> newExprs = new LinkedList<>();
-                    newExprs.addFirst(expr);
-                    return newExprs;
-                }
-                else {
-                    exprs.addFirst(expr);
-                    return exprs;
-                }
-            }
-            else{
-                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
-            }
-        }
-        else if (validetoken.contains(currentToken.getSymbole())){
-            return null;
-        }
-        else{
-            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
-        }
+        return AnalyseOrExpr();
     }
 
     private OrExpr AnalyseOrExpr(){
@@ -923,7 +861,7 @@ public class Parser {
         Token currentToken = tokenQueue.peek();
 
         if (validetoken.contains(currentToken.getSymbole())){
-            return AnalyseTerminalExpr();
+            return AnalyseCrochetExpr();
         }
         else if(currentToken.getSymbole().equals("-")){
             tokenQueue.poll();
@@ -933,6 +871,69 @@ public class Parser {
             throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
         }
 
+    }
+
+    private ExprTab AnalyseCrochetExpr(){
+
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("ident", "(", "[", "integer", "string", "True", "False", "None")) ;;
+
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+
+        Token currentToken = tokenQueue.peek();
+        if (validetoken.contains(currentToken.getSymbole())){
+
+            TermExpr termExpr = AnalyseTerminalExpr();
+            LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+
+            if (exprs == null)
+                return termExpr;
+            else 
+                return new ExprTab(termExpr,exprs);
+
+        }
+        else 
+            throw new ParsingError("Line : " +  currentToken.getSymbole());
+            
+    }
+
+    private LinkedList<Expr> AnalyseExprCrochetEtoile(){
+        final ArrayList<String> validetoken = new ArrayList<>(Arrays.asList("NEWLINE",")",":",",","=","]","<=",">=",">","<","!=","==","+","-","*","//","%","and","or")) ;
+        
+        if (tokenQueue.isEmpty()) {
+            throw new ParsingError("Pile de tokens vide !");
+        }
+        
+        Token currentToken = tokenQueue.peek();
+
+        if (currentToken.getSymbole().equals("[")){
+            tokenQueue.poll();
+            Expr expr = AnalyseExpr();
+
+            currentToken = tokenQueue.poll();
+            if(currentToken.getSymbole().equals("]")){
+                LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
+                if (exprs == null) {
+                    LinkedList<Expr> newExprs = new LinkedList<>();
+                    newExprs.addFirst(expr);
+                    return newExprs;
+                }
+                else {
+                    exprs.addFirst(expr);
+                    return exprs;
+                }
+            }
+            else{
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+            }
+        }
+        else if (validetoken.contains(currentToken.getSymbole())){
+            return null;
+        }
+        else{
+            throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+        }
     }
 
     private TermExpr AnalyseTerminalExpr(){
@@ -951,7 +952,7 @@ public class Parser {
             LinkedList<Expr> exprs = AnalyseExprRestIdent();
 
             if (exprs == null)
-                return new IdentP(ident, new ArrayList<Expr>());
+                return ident;
             else 
                 return new IdentP(ident, exprs);
         }
@@ -1008,7 +1009,7 @@ public class Parser {
                 return exprs;
             }
             else{
-                 throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
+                throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
             }
         }
         else if(validetoken1.contains(currentToken.getSymbole())){
@@ -1033,7 +1034,7 @@ public class Parser {
             return AnalyseExprPlusVirgule();
         }
         else if (validetoken2.contains(currentToken.getSymbole())){
-            return null;
+            return new LinkedList<>();
         } 
         else{
             throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());

@@ -53,7 +53,6 @@ public class Affect implements SimpleStmt {
             String rightExprNodeName = nodeName + "_rightExpr";
             writer.write("  " + nodeName + " -- " + rightExprNodeName + ";\n");
             rightExpr.vizualisation(writer, rightExprNodeName);  
-            System.out.println(rightExpr.getClass());
         }
     }
 
