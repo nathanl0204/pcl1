@@ -21,4 +21,4 @@ print("Le résultat de l'addition est:")
 print(resultat)
 liste = [1, 2, 3, 4, 5]
 b = ---a
-a = a or b and 2 and not 9 or a + 3
+a = a or b or b and not a + 3 or not 4

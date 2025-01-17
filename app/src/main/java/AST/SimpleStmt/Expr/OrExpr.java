@@ -25,8 +25,9 @@ public class OrExpr implements Expr {
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"OR\"];\n");
-
+        System.out.println(exprs.size());
         for (AndExpr child : exprs){
+            System.out.println(exprs.size());
             String childNodeName = nodeName + "_" + child.hashCode(); 
             writer.write("  " + nodeName + " -- " + childNodeName + ";\n");
             child.vizualisation(writer,childNodeName); 

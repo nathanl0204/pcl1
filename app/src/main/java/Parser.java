@@ -345,7 +345,8 @@ public class Parser {
 
             currentToken = tokenQueue.poll();
             if (currentToken.getSymbole().equals("=")){
-                return new Affect( ident , AnalyseExpr() );
+                Expr expr = AnalyseExpr();
+                return new Affect( ident , expr );
             }
             else {
                 throw new ParsingError("Line : " + currentToken.getLine() + " | Token : " + currentToken.getSymbole());
@@ -607,6 +608,8 @@ public class Parser {
             LinkedList<Expr> exprs = AnalyseExprCrochetEtoile();
 
             if (exprs == null){
+                System.out.println("1");
+                System.out.println(orExpr.getClass());
                 return orExpr;
             }
             else {
@@ -670,9 +673,13 @@ public class Parser {
             OrExpr orExpr = AnalyseOrExprRest();
 
             if (orExpr == null){
-                return andExpr;
+                System.out.println("passe par la ");
+                OrExpr orExpr_ = new OrExpr();
+                orExpr_.addOrExpr(andExpr);
+                return orExpr_;
             }
             else {
+                System.out.println("passe par ici ");
                 orExpr.addOrExpr(andExpr);
                 return orExpr;
             }
@@ -717,10 +724,12 @@ public class Parser {
             AndExpr andExpr = AnalyseAndExprRest();
 
             if (andExpr == null){
-                return notExpr;
+                AndExpr andExpr_ = new AndExpr();
+                andExpr_.addAndExpr(notExpr);
+                return andExpr_;
             }
             else {
-                andExpr.addOrExpr(notExpr);
+                andExpr.addAndExpr(notExpr);
                 return andExpr;
             }
         }

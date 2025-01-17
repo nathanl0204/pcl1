@@ -44,16 +44,16 @@ public class Affect implements SimpleStmt {
         writer.write("  " + nodeName + " [label=\"AFFECT\"];\n");
 
         if (this.leftExpr != null) {
-            String leftExprNodeName = nodeName + "_leftExpr"; 
-            
-            this.leftExpr.vizualisation(writer, leftExprNodeName);
+            String leftExprNodeName = nodeName + "_leftExpr";             
             writer.write("  " + nodeName + " -- " + leftExprNodeName + ";\n");
+            this.leftExpr.vizualisation(writer, leftExprNodeName);
         }
 
         if (this.rightExpr != null) {
             String rightExprNodeName = nodeName + "_rightExpr";
-            this.rightExpr.vizualisation(writer, rightExprNodeName);  
             writer.write("  " + nodeName + " -- " + rightExprNodeName + ";\n");
+            rightExpr.vizualisation(writer, rightExprNodeName);  
+            System.out.println(rightExpr.getClass());
         }
     }
 

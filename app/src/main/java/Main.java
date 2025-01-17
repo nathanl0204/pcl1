@@ -28,7 +28,7 @@ public class Main {
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write("graph G {\n");
 
-                result.simplify();
+                //result.simplify();
                 result.vizualisation(bufferedWriter);
 
                 bufferedWriter.write("}\n");
