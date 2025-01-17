@@ -26,7 +26,7 @@ public class Main {
                 FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
             
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-                bufferedWriter.write("graph G {\n");
+                bufferedWriter.write("graph AST {\n");
 
                 result.simplify();
                 result.vizualisation(bufferedWriter);

@@ -37,7 +37,6 @@ stmt_else -> else ":" suite .
  
 expr -> or_expr . 
 
- 
 or_expr -> and_expr or_expr_rest . 
  
 or_expr_rest -> .  
@@ -108,6 +107,3 @@ const -> string .
 const -> True . 
 const -> False . 
 const -> None .
- 
- 
- 
