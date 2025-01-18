@@ -11,20 +11,22 @@ import AST.Stmt.*;
 import AST.File;
 
 public class ParserTest {
+    private Lexeur lexeur;
     private Parser parser;
-    private static final String TEST_FILE_PATH = "src/main/resources/test.py";
+    private static final String TEST_FILE_PATH = "src/main/resources/test.mpy";
 
     @BeforeEach
     public void setup() {
+        lexeur = new Lexeur();
         parser = new Parser();
         
-        Lexeur.token_stack.clear();
-        Lexeur.indentations_stack.clear();
-        Lexeur.indentations_stack.add(0);
+        lexeur.token_stack.clear();
+        lexeur.indentations_stack.clear();
+        lexeur.indentations_stack.add(0);
         
-        Lexeur.execute(TEST_FILE_PATH);
+        lexeur.execute(TEST_FILE_PATH);
         
-        parser.setTokenQueueFromTokenStack(Lexeur.token_stack);
+        parser.setTokenQueueFromTokenStack(lexeur.token_stack);
     }
 
     @Test

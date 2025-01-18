@@ -9,12 +9,14 @@ import java.io.File;
 import java.io.PrintWriter;
 
 public class LexeurTest {
+    private Lexeur lexeur;
 
     @BeforeEach
     public void setup() {
-        Lexeur.token_stack.clear();
-        Lexeur.indentations_stack.clear();
-        Lexeur.indentations_stack.add(0);
+        lexeur = new Lexeur();
+        lexeur.token_stack.clear();
+        lexeur.indentations_stack.clear();
+        lexeur.indentations_stack.add(0);
     }
 
     @Test
@@ -27,7 +29,7 @@ public class LexeurTest {
             writer.println("    return --o+-a-y*j*3-j//-u*p");
         }
 
-        Lexeur.execute(tempFile.getAbsolutePath());
+        lexeur.execute(tempFile.getAbsolutePath());
 
         ArrayList<String[]> expectedTokens = new ArrayList<>();
         
@@ -67,15 +69,15 @@ public class LexeurTest {
         expectedTokens.add(new String[]{"EOF", "EOF", "EOF"});
         expectedTokens.add(new String[]{"$", "$", "$"});
 
-        assertEquals(expectedTokens.size(), Lexeur.token_stack.size(), "Le nombre de tokens générés n'est pas correct.");
+        assertEquals(expectedTokens.size(), lexeur.token_stack.size(), "Le nombre de tokens générés n'est pas correct.");
 
         for (int i = 0; i < expectedTokens.size(); i++) {
-            assertEquals(expectedTokens.get(i)[0], Lexeur.token_stack.get(i)[0], 
-                "Type de token incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[0] + ", Obtenu: " + Lexeur.token_stack.get(i)[0]);
-            assertEquals(expectedTokens.get(i)[1], Lexeur.token_stack.get(i)[1], 
-                "Valeur de token incorrecte pour le token " + i + ". Attendu: " + expectedTokens.get(i)[1] + ", Obtenu: " + Lexeur.token_stack.get(i)[1]);
-            assertEquals(expectedTokens.get(i)[2], Lexeur.token_stack.get(i)[2], 
-                "Numéro de ligne incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[2] + ", Obtenu: " + Lexeur.token_stack.get(i)[2]);
+            assertEquals(expectedTokens.get(i)[0], lexeur.token_stack.get(i)[0], 
+                "Type de token incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[0] + ", Obtenu: " + lexeur.token_stack.get(i)[0]);
+            assertEquals(expectedTokens.get(i)[1], lexeur.token_stack.get(i)[1], 
+                "Valeur de token incorrecte pour le token " + i + ". Attendu: " + expectedTokens.get(i)[1] + ", Obtenu: " + lexeur.token_stack.get(i)[1]);
+            assertEquals(expectedTokens.get(i)[2], lexeur.token_stack.get(i)[2], 
+                "Numéro de ligne incorrect pour le token " + i + ". Attendu: " + expectedTokens.get(i)[2] + ", Obtenu: " + lexeur.token_stack.get(i)[2]);
         }
     }
 
