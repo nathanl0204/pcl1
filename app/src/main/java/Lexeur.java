@@ -409,6 +409,14 @@ public class Lexeur {
                     String[] new_item = {item[0], "GT", item[2]};
                     token_stack.set(i, new_item);
                 }
+                else if (item[1].equals(">=")) {
+                    String[] new_item = {item[0], "GE", item[2]};
+                    token_stack.set(i, new_item);
+                }
+                else if (item[1].equals("<=")) {
+                    String[] new_item = {item[0], "LE", item[2]};
+                    token_stack.set(i, new_item);
+                }
             }
 
             reader.close();
