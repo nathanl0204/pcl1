@@ -5,16 +5,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Lexeur {
-    public static ArrayList<String[]> token_stack = new ArrayList<>();
-    public static ArrayList<Integer> indentations_stack = new ArrayList<>();
-    private static int indentation_counter;
-    private static int line_number = 1; // Ajout d'un compteur de ligne
+    public ArrayList<String[]> token_stack = new ArrayList<>();
+    public ArrayList<Integer> indentations_stack = new ArrayList<>();
+    private int indentation_counter;
+    private int line_number = 1; // Ajout d'un compteur de ligne
 
-    private static ArrayList<Character> current_buffer = new ArrayList<>();
-    private static char previous_caracter;
-    private static boolean stop_lexing = false;
+    private ArrayList<Character> current_buffer = new ArrayList<>();
+    private char previous_caracter;
+    private boolean stop_lexing = false;
 
-    public static String getAll(ArrayList<Character> list) {
+    public String getAll(ArrayList<Character> list) {
         String res = "";
         for (int i = 0; i<list.size(); i++) {
             res = res.concat(Character.toString(list.get(i)));
@@ -22,12 +22,12 @@ public class Lexeur {
         return res;
     }
 
-    public static void Lex(BufferedReader reader, int state, boolean does_read, boolean stop) throws IOException {
+    public void Lex(BufferedReader reader, int state, boolean does_read, boolean stop) throws IOException {
         if (stop) {
             String[] pre_final_terminal = {"EOF", "EOF", "EOF"};
-            Lexeur.token_stack.add(pre_final_terminal);
+            token_stack.add(pre_final_terminal);
             String[] final_terminal = {"$", "$", "$"};
-            Lexeur.token_stack.add(final_terminal);
+            token_stack.add(final_terminal);
             return;
         }
 
@@ -337,21 +337,21 @@ public class Lexeur {
         }
     }
 
-    public static void print_tokens(ArrayList<String[]> list) {
+    public void print_tokens() {
         System.out.print("[");
-        for (int i = 0; i<list.size(); i++) {
-            if (list.get(i)[1] == "NEWLINE") {
+        for (int i = 0; i<token_stack.size(); i++) {
+            if (token_stack.get(i)[1] == "NEWLINE") {
                 System.out.print("\n");
             }
-            System.out.print(Arrays.toString(list.get(i)));
-            if (i != (list.size() - 1)) {
+            System.out.print(Arrays.toString(token_stack.get(i)));
+            if (i != (token_stack.size() - 1)) {
                 System.out.print(",");
             }
         }
-        System.out.print("]");
+        System.out.print("] \n\n");
     }
 
-    public static boolean is_in(String element, String[] array) {
+    public boolean is_in(String element, String[] array) {
         for (int i = 0; i<array.length; i++) {
             if (element.equals(array[i])){
                 return true;
@@ -361,7 +361,7 @@ public class Lexeur {
     }
 
 
-    public static void execute(String filePath){
+    public void execute(String filePath){
 
         try{
             FileReader fileReader = new FileReader(filePath);
@@ -410,8 +410,6 @@ public class Lexeur {
                     token_stack.set(i, new_item);
                 }
             }
-
-            print_tokens(token_stack);
 
             reader.close();
         } catch (IOException e) {

@@ -5,6 +5,8 @@ import AST.Stmt.*;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.Arrays;
+
 class DefTest {
 
     @Test
@@ -16,19 +18,19 @@ class DefTest {
     }
 
     @Test
-    void testAddIdent() {
-        Def def = new Def();
-        Ident ident = new Ident();
-        def.setIdent(ident);
-        assertEquals(1, def.getIdents().size(), "La liste des idents devrait contenir un ident après l'ajout");
-    }
-
-    @Test
     void testSetIdent() {
         Def def = new Def();
         Ident ident = new Ident();
         def.setIdent(ident);
         assertEquals(ident, def.getIdent(), "Ident ne correspond pas après l'appel de setIdent");
+    }
+
+    @Test
+    void testAddIdent() {
+        Def def = new Def();
+        Ident ident = new Ident();
+        def.setIdents(Arrays.asList(ident));
+        assertEquals(1, def.getIdents().size(), "La liste des idents devrait contenir un ident après l'ajout");
     }
 
     @Test

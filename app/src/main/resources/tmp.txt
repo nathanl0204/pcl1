@@ -1,0 +1,109 @@
+ 
+file -> opt_newline def_etoile stmt_plus EOF . 
+ 
+opt_newline -> . 
+opt_newline -> NEWLINE . 
+ 
+def_etoile -> . 
+def_etoile -> deft def_etoile . 
+ 
+stmt_plus -> stmt stmt_plus_rest . 
+stmt_plus_rest -> .  
+stmt_plus_rest -> stmt_plus . 
+ 
+deft -> def ident "(" ident_etoile_virgule ")" ":" suite . 
+ 
+ident_etoile_virgule ->  . 
+ident_etoile_virgule -> ident_plus_virgule . 
+ident_plus_virgule -> ident ident_plus_virgule_rest . 
+ident_plus_virgule_rest ->  . 
+ident_plus_virgule_rest -> "," ident_plus_virgule . 
+ 
+suite -> simple_stmt NEWLINE . 
+suite -> NEWLINE BEGIN stmt_plus END . 
+ 
+simple_stmt -> return expr . 
+simple_stmt -> print "(" expr ")" . 
+simple_stmt -> expr simple_stmt_fact .
+ 
+simple_stmt_fact -> .  
+simple_stmt_fact -> "=" expr . 
+
+stmt -> simple_stmt NEWLINE . 
+stmt -> for ident in expr ":" suite . 
+stmt -> if expr ":" suite stmt_else . 
+stmt_else -> . 
+stmt_else -> else ":" suite . 
+ 
+expr -> or_expr . 
+
+or_expr -> and_expr or_expr_rest . 
+ 
+or_expr_rest -> .  
+or_expr_rest -> binop_or or_expr . 
+ 
+and_expr -> not_expr and_expr_rest . 
+ 
+and_expr_rest -> .  
+and_expr_rest -> binop_and and_expr . 
+ 
+not_expr -> comp_expr . 
+not_expr -> not comp_expr . 
+ 
+comp_expr -> add_expr comp_expr_rest . 
+ 
+comp_expr_rest -> .  
+comp_expr_rest -> binop_comp add_expr . 
+ 
+add_expr -> mut_expr add_expr_rest . 
+ 
+add_expr_rest -> .  
+add_expr_rest -> binop_add add_expr . 
+ 
+mut_expr -> minus_expr mut_expr_rest . 
+ 
+mut_expr_rest -> . 
+mut_expr_rest -> binop_mut mut_expr . 
+ 
+minus_expr -> "-" crochet_expr .  
+minus_expr ->  crochet_expr . 
+
+crochet_expr -> terminal_expr expr_crochet_etoile .
+
+expr_crochet_etoile -> .  
+expr_crochet_etoile -> "[" expr "]" expr_crochet_etoile . 
+
+terminal_expr -> "(" expr ")" . 
+terminal_expr ->  const . 
+terminal_expr ->  ident expr_rest_ident . 
+terminal_expr ->  "[" expr_etoile_virgule "]" . 
+ 
+expr_rest_ident -> "(" expr_etoile_virgule ")" . 
+expr_rest_ident -> . 
+ 
+expr_etoile_virgule -> . 
+expr_etoile_virgule -> expr_plus_virgule . 
+ 
+expr_plus_virgule -> expr expr_plus_virgule_rest . 
+expr_plus_virgule_rest -> . 
+expr_plus_virgule_rest -> "," expr_plus_virgule . 
+ 
+binop_add -> "+" . 
+binop_add -> "-" . 
+binop_mut -> "*" . 
+binop_mut -> "//" . 
+binop_mut -> "%" . 
+binop_comp -> "<=" . 
+binop_comp -> ">=" . 
+binop_comp -> ">" . 
+binop_comp -> "<" . 
+binop_comp -> "!=" . 
+binop_comp -> "==" . 
+binop_and -> and . 
+binop_or -> or . 
+ 
+const -> integer . 
+const -> string . 
+const -> True . 
+const -> False . 
+const -> None .

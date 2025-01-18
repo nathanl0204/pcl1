@@ -25,7 +25,7 @@ public class OrExpr implements Expr {
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"OR\"];\n");
-
+        
         for (AndExpr child : exprs){
             String childNodeName = nodeName + "_" + child.hashCode(); 
             writer.write("  " + nodeName + " -- " + childNodeName + ";\n");
@@ -40,6 +40,7 @@ public class OrExpr implements Expr {
 
         exprs.removeIf(expr -> expr instanceof BoolType && !((BoolType)expr).getValue());
         if (exprs.isEmpty()) return new BoolType(false); 
+        if (exprs.size() == 1) return exprs.get(0);
 
         for (Expr expr : exprs) {
             if (expr instanceof BoolType && ((BoolType)expr).getValue() ){

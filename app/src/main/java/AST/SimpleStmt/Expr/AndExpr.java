@@ -40,6 +40,7 @@ public class AndExpr extends OrExpr {
 
         exprs.removeIf(expr -> expr instanceof BoolType && ((BoolType)expr).getValue());
         if (exprs.isEmpty()) return new BoolType(true); 
+        if (exprs.size() == 1) return exprs.get(0);
 
         for (Expr expr : exprs) {
             if (expr instanceof BoolType && !((BoolType)expr).getValue() ){
