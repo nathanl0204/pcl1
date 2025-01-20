@@ -49,7 +49,7 @@ public class MutExpr extends AddExpr {
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\""+ this.symbole.name() + "\"];\n");
-
+        
         if (this.left != null) {
             String leftNodeName = nodeName + "_left"; 
             writer.write("  " + nodeName + " -- " + leftNodeName + ";\n");
@@ -65,7 +65,10 @@ public class MutExpr extends AddExpr {
 
     public MutExpr simplify(){
         leftRotate();
-        this.left = left.simplify();
+        System.out.println(left == null);
+        System.out.println(left.getClass().toString());
+        this.left = this.left.simplify();
+        System.out.println(left == null);
         this.right = right.simplify();
 
         if (left instanceof IntegerType && right instanceof IntegerType) {

@@ -35,14 +35,12 @@ public class NotExpr extends AndExpr {
     }
 
     public NotExpr simplify(){
-        if (expr == null) return null;
         expr = expr.simplify();  
-        if (expr == null) return null;
 
         if (expr instanceof BoolType && ((BoolType) expr).getValue()) return new BoolType(false);
         if (expr instanceof BoolType && !((BoolType) expr).getValue()) return new BoolType(true);
-        if (expr instanceof CompExpr) return this;
-        if (expr instanceof NotExpr) return ((NotExpr) expr).getNotExpr();
+
+        if (expr.getClass().equals(NotExpr.class)) return ((NotExpr) expr).getNotExpr();
         return this;
     }
 }

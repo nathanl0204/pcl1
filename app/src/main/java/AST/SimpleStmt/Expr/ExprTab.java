@@ -30,7 +30,6 @@ public class ExprTab extends MinusExpr {
 
     public void vizualisation(BufferedWriter writer, String nodeName) throws IOException {
         writer.write("  " + nodeName + " [label=\"TAB_ACCES\"];\n");
-    
         if (expr != null) {
             String leftNodeName = nodeName + "_left";
             writer.write("  " + nodeName + " -- " + leftNodeName + ";\n");
@@ -40,7 +39,6 @@ public class ExprTab extends MinusExpr {
         String indexNodeName = nodeName + "_INDEX";
         writer.write("  " + indexNodeName + " [label=\"INDEX\"];\n");
         writer.write("  " + nodeName + " -- " + indexNodeName + ";\n");
-    
         for (int i = 0; i < exprs.size(); i++) {
             String childNodeName = indexNodeName + "_child" + i;
             writer.write("  " + indexNodeName + " -- " + childNodeName + ";\n");
