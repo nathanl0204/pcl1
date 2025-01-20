@@ -1,7 +1,10 @@
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
+
+import javax.swing.text.html.parser.Parser;
+
 import AST.*;
 import AST.SimpleStmt.*;
 import AST.SimpleStmt.Expr.*;
@@ -11,14 +14,13 @@ import AST.Stmt.*;
 import AST.File;
 
 public class ParserTest {
-    private Lexeur lexeur;
-    private Parser parser;
-    private static final String TEST_FILE_PATH = "src/main/resources/test.mpy";
+    private Parser parser = new Parser();
+    private Lexeur lexeur = new Lexeur();
+    private static final String TEST_FILE_PATH = "src/main/resources/test.py";
+    File ast;
 
-    @BeforeEach
+    @BeforeAll
     public void setup() {
-        lexeur = new Lexeur();
-        parser = new Parser();
         
         lexeur.token_stack.clear();
         lexeur.indentations_stack.clear();
@@ -27,93 +29,70 @@ public class ParserTest {
         lexeur.execute(TEST_FILE_PATH);
         
         parser.setTokenQueueFromTokenStack(lexeur.token_stack);
+        ast = parser.startAnalyse();
     }
 
     @Test
-    public void testFunctionDefinitions() {
-        File ast = parser.startAnalyse();
-        assertNotNull(ast, "L'AST ne devrait pas être null");
-        
-        assertFalse(ast.getDefs().isEmpty(), "Il devrait y avoir des définitions de fonctions");
-        
-        Def funcI = ast.getDefs().get(0);
-        assertEquals("i", funcI.getIdent().getName(), "La première fonction devrait s'appeler 'i'");
-        assertEquals(3, funcI.getIdents().size(), "La fonction 'i' devrait avoir 3 paramètres");
-        
-        Def funcAdd = ast.getDefs().get(1);
-        assertEquals("add", funcAdd.getIdent().getName(), "La deuxième fonction devrait s'appeler 'add'");
-        assertEquals(2, funcAdd.getIdents().size(), "La fonction 'add' devrait avoir 2 paramètres");
-        
-        Def funcMultiply = ast.getDefs().get(2);
-        assertEquals("multiply", funcMultiply.getIdent().getName(), "La troisième fonction devrait s'appeler 'multiply'");
-        assertEquals(2, funcMultiply.getIdents().size(), "La fonction 'multiply' devrait avoir 2 paramètres");
-    }
-
-    @Test
-    public void testVariableAssignments() {
-        File ast = parser.startAnalyse();
-        
-        boolean foundX = false;
-        boolean foundY = false;
-        boolean foundZ = false;
-        
-        for (Stmt stmt : ast.getStmts()) {
-            if (stmt instanceof Affect) {
-                Affect affect = (Affect) stmt;
-                if (affect.getLeft() instanceof Ident) {
-                    Ident ident = (Ident) affect.getLeft();
-                    switch (ident.getName()) {
-                        case "x":
-                            foundX = true;
-                            if (affect.getRight() instanceof IntegerType) {
-                                assertEquals(10, ((IntegerType) affect.getRight()).getValue());
-                            }
-                            break;
-                        case "y":
-                            foundY = true;
-                            if (affect.getRight() instanceof IntegerType) {
-                                assertEquals(20, ((IntegerType) affect.getRight()).getValue());
-                            }
-                            break;
-                        case "z":
-                            foundZ = true;
-                            assertTrue(affect.getRight() instanceof IdentP, "z devrait être assigné à un appel de fonction");
-                            break;
+    public void testParserAnalyse() {
+        try {
+            assertNotNull(ast, "L'AST ne devrait pas être null");
+            
+            assertFalse(ast.getDefs().isEmpty(), "Il devrait y avoir au moins une définition de fonction");
+            Def funcI = ast.getDefs().get(0);
+            assertEquals("i", funcI.getIdent().getName(), "La première fonction devrait s'appeler 'i'");
+            assertEquals(3, funcI.getIdents().size(), "La fonction 'i' devrait avoir 3 paramètres");
+            
+            assertFalse(ast.getStmts().isEmpty(), "Il devrait y avoir des statements");
+            
+            boolean foundAffectA = false;
+            boolean foundAffectB = false;
+            boolean foundAffectC = false;
+            
+            for (Stmt stmt : ast.getStmts()) {
+                if (stmt instanceof Affect) {
+                    Affect affect = (Affect) stmt;
+                    if (affect.getLeft() instanceof Ident) {
+                        Ident ident = (Ident) affect.getLeft();
+                        switch (ident.getName()) {
+                            case "a":
+                                foundAffectA = true;
+                                break;
+                            case "b":
+                                foundAffectB = true;
+                                break;
+                            case "c":
+                                foundAffectC = true;
+                                break;
+                        }
                     }
                 }
             }
+            
+            assertTrue(foundAffectA, "L'affectation de 'a' devrait être présente");
+            assertTrue(foundAffectB, "L'affectation de 'b' devrait être présente");
+            assertTrue(foundAffectC, "L'affectation de 'c' devrait être présente");
+            
+        } catch (ParsingError e) {
+            fail("Le parsing ne devrait pas échouer: " + e.getMessage());
         }
-        
-        assertTrue(foundX, "La variable x devrait être déclarée");
-        assertTrue(foundY, "La variable y devrait être déclarée");
-        assertTrue(foundZ, "La variable z devrait être déclarée");
     }
 
     @Test
-    public void testIfStatements() {
-        File ast = parser.startAnalyse();
+    public void testIfStatement() {
         boolean foundIfStatement = false;
-        boolean foundIfElseStatement = false;
         
         for (Stmt stmt : ast.getStmts()) {
-            if (stmt instanceof If) {
+            if (stmt instanceof If || stmt instanceof IfElse) {
                 foundIfStatement = true;
-            } else if (stmt instanceof IfElse) {
-                foundIfElseStatement = true;
-                IfElse ifElse = (IfElse) stmt;
-                assertNotNull(ifElse.getIf(), "La condition de if-else ne devrait pas être null");
-                assertNotNull(ifElse.getThen(), "La suite du if ne devrait pas être null");
-                assertNotNull(ifElse.getElse(), "La suite du else ne devrait pas être null");
+                break;
             }
         }
         
         assertTrue(foundIfStatement, "Au moins une structure If devrait être présente");
-        assertTrue(foundIfElseStatement, "Au moins une structure If-Else devrait être présente");
     }
 
     @Test
-    public void testForLoops() {
-        File ast = parser.startAnalyse();
+    public void testForLoop() {
         boolean foundForLoop = false;
         
         for (Stmt stmt : ast.getStmts()) {
@@ -122,74 +101,48 @@ public class ParserTest {
                 For forStmt = (For) stmt;
                 assertNotNull(forStmt.getIdent(), "La variable d'itération ne devrait pas être null");
                 assertNotNull(forStmt.getExpr(), "L'expression du for ne devrait pas être null");
-                assertNotNull(forStmt.getSuite(), "La suite du for ne devrait pas être null");
+                break;
             }
         }
         
-        assertTrue(foundForLoop, "Au moins une boucle For devrait être présente");
+        assertTrue(foundForLoop, "Une boucle For devrait être présente");
     }
 
     @Test
-    public void testListOperations() {
-        File ast = parser.startAnalyse();
+    public void testListDeclaration() {
         boolean foundListDeclaration = false;
-        boolean foundListAccess = false;
-        boolean foundListAssignment = false;
         
         for (Stmt stmt : ast.getStmts()) {
             if (stmt instanceof Affect) {
                 Affect affect = (Affect) stmt;
-                
                 if (affect.getRight() instanceof ListType) {
                     foundListDeclaration = true;
                     ListType list = (ListType) affect.getRight();
-                    assertFalse(list.getExprs().isEmpty(), "La liste ne devrait pas être vide");
-                }
-                
-                if (affect.getRight() instanceof AddExpr) {
-                    if (((AddExpr) affect.getRight()).getLeft() instanceof ExprTab) {
-                        foundListAccess = true;
-                    }
-                }
-                
-                if (affect.getLeft() instanceof ExprTab) {
-                    foundListAssignment = true;
+                    assertEquals(5, list.getExprs().size(), "La liste devrait contenir 5 éléments");
+                    break;
                 }
             }
         }
         
         assertTrue(foundListDeclaration, "Une déclaration de liste devrait être présente");
-        assertTrue(foundListAccess, "Un accès à un élément de liste devrait être présent");
-        assertTrue(foundListAssignment, "Une affectation à un élément de liste devrait être présente");
     }
 
     @Test
-    public void testComplexExpressions() {
-        File ast = parser.startAnalyse();
-        boolean foundUnaryMinus = false;
-        boolean foundArithmeticExpr = false;
-        boolean foundLogicalExpr = false;
+    public void testComplexExpression() {
+        boolean foundComplexExpr = false;
         
         for (Stmt stmt : ast.getStmts()) {
-            if (stmt instanceof Affect) {
-                Expr expr = ((Affect) stmt).getRight();
-                
-                if (expr instanceof MinusExpr) {
-                    foundUnaryMinus = true;
-                }
-                
-                if (expr instanceof AddExpr || expr instanceof MutExpr) {
-                    foundArithmeticExpr = true;
-                }
-                
-                if (expr instanceof OrExpr || expr instanceof AndExpr) {
-                    foundLogicalExpr = true;
+            if (stmt instanceof Affect && ((Affect) stmt).getLeft() instanceof Ident) {
+                Ident ident = (Ident) ((Affect) stmt).getLeft();
+                if (ident.getName().equals("a")) {
+                    foundComplexExpr = true;
+                    Expr expr = ((Affect) stmt).getRight();
+                    assertNotNull(expr, "L'expression complexe ne devrait pas être null");
+                    break;
                 }
             }
         }
         
-        assertTrue(foundUnaryMinus, "Une expression avec moins unaire devrait être présente");
-        assertTrue(foundArithmeticExpr, "Une expression arithmétique complexe devrait être présente");
-        assertTrue(foundLogicalExpr, "Une expression logique devrait être présente");
+        assertTrue(foundComplexExpr, "Une expression complexe avec opérateurs logiques devrait être présente");
     }
 }

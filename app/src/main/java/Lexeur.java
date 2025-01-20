@@ -25,8 +25,8 @@ public class Lexeur {
     public void Lex(BufferedReader reader, int state, boolean does_read, boolean stop) throws IOException {
         if (stop) {
             // Décommenter les lignes ci-dessous si jamais il y a une exception lors de l'exécution du parser quand il arrive à EOF
-            /* String[] newline_terminal = {"ws", "NEWLINE", String.valueOf(line_number)};
-            token_stack.add(newline_terminal); */
+            String[] newline_terminal = {"ws", "NEWLINE", String.valueOf(line_number)};
+            token_stack.add(newline_terminal);
             String[] pre_final_terminal = {"EOF", "EOF", "EOF"};
             token_stack.add(pre_final_terminal);
             String[] final_terminal = {"$", "$", "$"};
