@@ -65,10 +65,7 @@ public class MutExpr extends AddExpr {
 
     public MutExpr simplify(){
         leftRotate();
-        System.out.println(left == null);
-        System.out.println(left.getClass().toString());
         this.left = this.left.simplify();
-        System.out.println(left == null);
         this.right = right.simplify();
 
         if (left instanceof IntegerType && right instanceof IntegerType) {
