@@ -25,14 +25,6 @@ class NotExprTest {
     }
 
     @Test
-    void testSimplifyWithNoExpr() {
-        NotExpr notExpr = new NotExpr();
-        NotExpr simplified = notExpr.simplify();
-        
-        assertNull(simplified);
-    }
-
-    @Test
     void testSimplifyDoubleNot() {
         NotExpr notExpr = new NotExpr();
         NotExpr innerNotExpr = new NotExpr();

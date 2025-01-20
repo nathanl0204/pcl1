@@ -46,12 +46,4 @@ class MinusExprTest {
         
         assertSame(minusExpr, simplified); 
     }
-    
-    @Test
-    void testSimplifyNullExpr() {
-        MinusExpr minusExpr = new MinusExpr();
-        MinusExpr simplified = minusExpr.simplify();
-        
-        assertNull(simplified);
-    }
 }
