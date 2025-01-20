@@ -213,5 +213,3 @@ public class ParserTest {
 
         assertDoesNotThrow(() -> parser.startAnalyse());
     }
-
-}

@@ -28,7 +28,7 @@ public class Main {
                 
                 File result = parser.startAnalyse();
 
-                FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
+                /* FileWriter fileWriter = new FileWriter("/home/clem/TN/2A/pcl-grp03/app/src/main/resources/output.dot");
             
                 BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
                 bufferedWriter.write("graph AST {\n");
@@ -39,7 +39,7 @@ public class Main {
 
                 bufferedWriter.write("}\n");
                 bufferedWriter.close();
-                fileWriter.close();
+                fileWriter.close(); */
             }
         }
     }
